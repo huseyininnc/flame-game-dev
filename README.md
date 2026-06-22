@@ -57,7 +57,7 @@ Place this folder under `~/.claude/skills/flame-game-dev/`. In Claude Code, the 
 
 ## Contributing
 
-Open source and open to development — contributions are welcome.
+Open source and open to development — contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 - Open an issue to propose ideas/changes, or fork and send a pull request.
 - Follow the conventions in `SKILL.md`: **no code comments**, SOLID/DRY/KISS, `very_good_analysis`-clean Dart.
