@@ -81,7 +81,7 @@ KB'ler skill içindedir; yollar skill köküne görelidir (`references/...`).
 3. **İskele:** `flame_game` template'i için VGV `create-project` skill'ini kullan (yoksa `flutter create`). Proje adında çizgi yerine `_`.
 4. **Mimari:** `references/flame/10`'daki Bloc + katmanlı strateji. Oyun durumu Bloc/Cubit'te; real-time sim component'lerde; component↔Bloc workspace konvansiyonuyla (mevcut oyunlar `game.gameBloc` doğrudan referansı kullanır).
 5. **Sahne/ekran:** menü/level → `RouterComponent`; pause/game-over/HUD → overlays (`references/flame/09`).
-6. **Assetler:** `scripts/` Vertex GenAI üreticisiyle görsel (webp) + ses üret (`references/asset-generation.md`). **Sanat yönü oyunun içeriğine/temasına/hedef kitlesine göre OTOMATİK seçilir** (modern flat, painterly, vektör, cartoon, izometrik, pixel-art… — **pixel-art varsayılan/zorunlu değil**); seçilen stille tutarlı tek bir style-guide belirle ve tüm asset'lere uygula. Stil ne olursa olsun responsive kuralları (`references/responsive-design.md`) geçerli.
+6. **Assetler:** görsel + ses **manifest**'i yazıp `scripts/asset_gen.py` ve `scripts/audio_gen.py` ile üret (`references/asset-generation.md`). **Sanat yönü oyunun içeriğine/temasına/hedef kitlesine göre OTOMATİK seçilir** (modern flat, painterly, vektör, cartoon, izometrik, pixel-art… — **pixel-art varsayılan/zorunlu değil**); seçilen stille tutarlı tek bir style-guide belirle ve tüm asset'lere uygula. Stil ne olursa olsun responsive kuralları (`references/responsive-design.md`) geçerli.
 7. **Game feel:** her etkileşime juice ekle — feedback, screenshake, hit-stop, easing, ses (`references/game-design/04`). Önce kontrol+mekanik, sonra cila.
 8. **Onboarding:** ilk 60 saniyeyi show-don't-tell ile tasarla, tek-mekanik-tanıt (`references/game-design/05`).
 9. **Performans:** `onLoad` preload; `update`'te allocation yok; sık nesnelerde pooling; `FpsTextComponent`.
@@ -99,7 +99,8 @@ Ayrıntılı kontrol listeleri: `references/production-standards.md` (**studio-g
 
 ## Asset üretimi
 
-Vertex GenAI üreticileri (`gemini-3-pro-image-preview`) ve `.env` (VERTEX_API_KEY) bu skill'in içinde gömülüdür: **`scripts/`** (skill köküne göreli). Çalıştırmak için skill'in `scripts/` dizinine `cd` et; her generator'ın `OUTPUT_DIR`'i ilgili oyunun `assets/`'ine mutlak yol verir; yeni oyun için mevcut `generate_*_assets.py`'yi türet. Prompt kalıpları, şeffaflık (chroma-key — özneyle çakışmayan chroma rengi seç), boyut/anchor kuralları: `references/asset-generation.md`. (Not: `.env` gerçek anahtar içerir — skill'i herkese açık paylaşma.)
+İki **generic, manifest-güdümlü** araç skill içinde: `scripts/asset_gen.py` (Vertex `gemini-3-pro-image-preview` ile görsel; opaque veya chroma-key şeffaf webp) ve `scripts/audio_gen.py` (stdlib ile sfx/bgm wav). Her oyuna ayrı betik YAZMA — bir JSON manifest yaz, aracı çalıştır:
+`cd scripts && pip install -r requirements.txt && cp .env.example .env` (`.env`'e VERTEX_API_KEY) → `python asset_gen.py --manifest <oyun>.json --out <oyun>/assets/images`. Chroma: özneyle çakışmayan renk (yeşil/cyan özne→`magenta`, kırmızı özne→`green`). Detay/şema: `references/asset-generation.md` + `scripts/README.md`. (`.env` commit edilmez.)
 
 ## Component yazım kuralları
 

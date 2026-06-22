@@ -1,0 +1,29 @@
+{
+  "style": "modern flat vector game art with soft glow, smooth shading, clean readable silhouette, single subject centered and filling most of the frame, fully original, no existing IP, no brand logos, no text, no watermark",
+  "assets": [
+    {
+      "name": "bg",
+      "aspect": "9:16",
+      "mode": "opaque",
+      "prompt": "a calm dark vertical gradient game background, deep blue to teal, faint floating particle bokeh, non-distracting, opaque full-bleed"
+    },
+    {
+      "name": "icon",
+      "aspect": "1:1",
+      "mode": "opaque",
+      "prompt": "a square mobile app icon: a single glowing cyan mascot with simple dot eyes on a dark rounded-square background, high contrast"
+    },
+    {
+      "name": "hero",
+      "aspect": "1:1",
+      "mode": "magenta",
+      "prompt": "a cute glowing green blob mascot with friendly dot eyes (green subject -> magenta screen so it is not keyed out)"
+    },
+    {
+      "name": "enemy",
+      "aspect": "1:1",
+      "mode": "green",
+      "prompt": "a small menacing red creature enemy with angry eyes (red subject -> green screen)"
+    }
+  ]
+}

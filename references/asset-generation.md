@@ -1,44 +1,61 @@
 # AI Asset Üretimi (Vertex GenAI)
 
-> Tüm üreticiler ve `.env` (VERTEX_API_KEY) bu skill'in içinde **gömülüdür** (`scripts/`, skill köküne göreli). Skill self-contained'dir. Çalıştırmak için skill'in `scripts/` dizinine `cd` et (`load_dotenv()` `.env`'i oradan okur). Her generator'ın `OUTPUT_DIR`'i ilgili oyunun `assets/` klasörüne mutlak yol verir.
+> Üretici araçlar ve `.env.example` bu skill içinde **gömülüdür** (`scripts/`, skill köküne göreli). Açık kaynak için araçlar **generic & config (manifest) güdümlüdür** — her oyuna ayrı betik yazılmaz; bir JSON manifest yazıp tek aracı çalıştırırsın. Kurulum: `cd scripts && pip install -r requirements.txt && cp .env.example .env` (`.env`'e `VERTEX_API_KEY` koy; `.env` commit edilmez). Tam kullanım: `scripts/README.md`.
 
-`scripts/` altında Vertex GenAI tabanlı üreticiler bulunur. Mevcut başlangıç noktaları: `scripts/create_image_with_gemini_api.py` (tek görsel) ve `scripts/generate_slime_assets.py` (çoklu prompt + PNG→şeffaf webp dönüşümü; örnek). Model: `gemini-3-pro-image-preview`, Vertex `genai.Client(vertexai=True, api_key=...)`.
+İki generic araç:
+- **`scripts/asset_gen.py`** — Vertex GenAI (Gemini image, `gemini-3-pro-image-preview`) ile görseller; prompt-driven; opaque veya chroma-key şeffaf; webp kaydeder.
+- **`scripts/audio_gen.py`** — sadece Python stdlib ile sentez sfx/bgm (`.wav`); bağımlılık yok.
 
-Her oyun için bu scriptleri **türeterek** projeye özel asset üreticileri oluştur (görsel + ses). Kaynak betiği bozma; kopyala/genişlet.
+## Görsel üretimi (manifest)
 
-## Sanat yönü serbesttir
+```bash
+python asset_gen.py --manifest mygame_assets.json --out <oyun>/assets/images
+```
 
-Sanat stili **oyuna göre** seçilir — modern (yumuşak/glossy 3D, flat, vektör), pixel-art, el-çizimi vb. Pixel-art zorunlu değildir. Önemli olan **her oyunda tutarlı bir style-guide** belirleyip tüm asset'lere aynı cümleyi uygulamaktır.
+Manifest:
+```json
+{
+  "style": "her prompt'a eklenen global style-guide (opsiyonel)",
+  "assets": [
+    {"name":"bg",    "aspect":"9:16","mode":"opaque",  "prompt":"..."},
+    {"name":"hero",  "aspect":"1:1", "mode":"magenta", "prompt":"..."},
+    {"name":"enemy", "aspect":"1:1", "mode":"green",   "prompt":"..."}
+  ]
+}
+```
+- `mode: opaque` → opak webp (arka plan, ikon, full-frame sahne).
+- `mode: green | magenta` → o chroma ekranda üretilir, sonra cutout ile **şeffaf** webp. (Bu model "transparent background" prompt'undan gerçek alfa vermez; şeffaflık chroma + cutout iledir.)
+- **Chroma rengini özneyle çakışmayacak şekilde seç:** yeşil/cyan/mavi özne → `magenta`; kırmızı/magenta özne → `green`. (Yeşil özneyi yeşil ekranda üretirsen keylenip silinir.)
+- `name` alt-klasör içerebilir (`ui/button`). Bayraklar: `--model --delay --overwrite --api-key`.
 
-## Üretim ilkeleri
+## Sanat yönü serbesttir (oyuna göre OTOMATİK)
 
-- **Webp formatı.** Model PNG döndürür; üretim sonrası webp'e dönüştür (Pillow: `img.save(path, "WEBP")`). Şeffaflık gerekiyorsa webp alpha'yı korur (`lossless=True`).
-- **Şeffaf arka plan** sprite'lar için: prompt'a "isolated, centered, plain background" ekle; model temiz şeffaf vermezse köşeden flood-fill ile arka planı temizle (bkz. `generate_slime_assets.py` `cutout_background`).
-- **Tutarlı stil:** Aynı oyunun tüm asset'lerinde aynı style-guide cümlesini (palet, ışık, ton, form dili) kullan.
-- **Sprite sheet** gerekiyorsa kareleri ayrı üretip kodda `SpriteSheet`/`SpriteAnimationData` ile birleştir; ya da tek sheet üretip `srcSize`/`srcPosition` ile dilimle.
-- **Boyut/anchor:** Asset boyutunu oyunun logical/fixed-resolution uzayına göre planla (ör. tile 256px kaynak, oyunda hücre boyutuna ölçeklenir).
+Stil oyunun içeriğine/temasına göre seçilir — modern flat/vektör, painterly, cartoon, izometrik, pixel-art vb. **Pixel-art zorunlu/varsayılan değil.** Her oyunda **tutarlı tek style-guide** belirle (manifest `style` alanı) ve tüm asset'lere uygula. Per-game görsel kimlik kuralları: `references/game-design/09-art-ui-identity-and-orientation.md`.
 
 ## Görsel prompt kalıbı
-
 ```
-<konu>, <stil-rehberi: ör. modern soft 3D glossy / flat vector / pixel art>,
-<palet/renk>, centered, isolated, plain background,
+<konu>, <stil-rehberi: modern flat / painterly / vektör / pixel art ...>,
+<palet/renk>, centered, single subject,
 no text, no watermark, fully original, no existing characters or brands.
 ```
+(Chroma ekran cümlesini `asset_gen.py` `mode`'a göre otomatik ekler — manifest'te tekrar yazma.)
 
-## Ses üretimi
+## Ses üretimi (manifest)
 
-Vertex/GenAI ses üretimi için ayrı bir script türet; sfx (kısa, `assets/audio/sfx/`) ve bgm (döngü, `assets/audio/music/`) ayrımını koru. Üretilen ses motor tarafında `FlameAudio.play` (sfx) / `FlameAudio.bgm` (müzik) ile kullanılır (bkz. `references/flame/08`).
+```bash
+python audio_gen.py --manifest mygame_audio.json --out <oyun>/assets/audio
+```
+`sfx` = tone `ops` dizisi (`freq` veya akor `freqs`, `dur`, ops: `vol/shape(sine|square|tri)/glide/attack/release`); `music` = ambient pad (`voices`, `seconds`). sfx kısa (`assets/audio/sfx/`), bgm döngü (`assets/audio/music/`). Motor tarafı: `FlameAudio.play` / `FlameAudio.bgm` (bkz. `references/flame/08`).
 
-## Güvenlik / kimlik bilgisi notu
+## Güvenlik / kimlik bilgisi
 
-- API anahtarı `scripts/.env` içinde tutulur (`python-dotenv` ile yüklenir), `.gitignore` ile korunur — **commit edilmez.** Yeni üreticilerde anahtarı `os.environ`'dan oku.
-- Üretilen prompt'lara daima `fully original, no existing IP, no brand logos, no copyrighted characters, no text` ekle (telif güvenliği).
-- Ham PNG çıktıları repo'yu şişirmesin; yalnızca son webp/ses asset'lerini `assets/` altına al.
+- API anahtarı `scripts/.env` (`.gitignore` ile korunur) veya `--api-key` / env — **asla commit edilmez**, asla prompt/manifest içine gömülmez.
+- Prompt'lara daima `fully original, no existing IP, no brand logos, no copyrighted characters, no text` ekle (telif güvenliği; bkz. game-greenlight `copyright-clearance`).
+- Ham PNG çıktıları repo'yu şişirmesin; yalnızca son webp/wav `assets/` altına.
 
 ## Akış
 
-1. Oyunun style-guide cümlesini ve sanat yönünü belirle.
-2. Bir üreticiyi kopyalayıp oyuna özel yaz (çoklu prompt + webp dönüşümü + gerekiyorsa şeffaflık + çıktı klasörü).
-3. Üret → gözden geçir → `assets/images/` (webp) ve `assets/audio/` altına yerleştir.
-4. `pubspec.yaml`'a kaydet (`assets/images/`), `onLoad`'da `Sprite.load` ile preload et.
+1. Oyunun style-guide'ını + sanat yönünü + per-game kimliğini belirle (KB/09).
+2. Görsel + ses **manifest**'lerini yaz (oyuna özel; chroma mode'larını özneye göre seç).
+3. `asset_gen.py` / `audio_gen.py` çalıştır → gözden geçir → `assets/images/` (webp) ve `assets/audio/` altına yerleşir.
+4. `pubspec.yaml`'a `assets/` ekle; `onLoad`'da `Sprite.load` ile preload.
