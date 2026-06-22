@@ -1,133 +1,133 @@
-# Level Design İlkeleri
+# Level Design Principles
 
-Level design = **oyuncuyu, mekaniği pekiştiren mekânlar/durumlar aracılığıyla aksiyon almaya motive etme** sanatı. Görsellik değil; layout, encounter (karşılaşma) ve **akış (flow)** ile ilgilidir. Bu doküman bu workspace'in level design üretim kurallarıdır.
+Level design = the art of **motivating the player to take action through spaces/situations that reinforce a mechanic**. It is not about visuals; it is about layout, encounters, and **flow**. This document defines this workspace's level design production rules.
 
-> 2D/casual/puzzle'a özel uygulama (levels-as-data, zorluk şablonu, tuning) → `08-level-design-for-2d-casual.md`. Zorluk eğrisi/pacing teorisi → `03-difficulty-and-pacing.md`.
-
----
-
-## 1. Level döngüsü: Introduce → Develop → Twist → Conclude
-
-Nintendo'nun (Koichi Hayashida; Batı'da Mark Brown/GMTK ile yaygınlaşan) tek-mekaniğe dair tekrar kullanılabilir yapısı. **Bir level = bir çekirdek fikir.**
-
-1. **Introduce (Tanıt):** Yeni mekanik **güvenli, sonuçsuz** bir alanda belirir; oyuncu ölemez, deneyerek keşfeder.
-2. **Develop (Geliştir):** Aynı mekanik, biraz daha karmaşık senaryo / hafif risk.
-3. **Twist (Çevir):** Mekaniği yeniden bağlamlandır — ters çevir, başka bir öğeyle eşle; oyuncuyu "yeniden düşünmeye" zorla. ("Onları şaşırtan bir doozy.")
-4. **Conclude (Ustalaşma):** Genelde hedeften hemen önce, öğretilen beceriyi **kanıtlatan** final challenge. Sonra mekaniği **at** — sıradaki level yeni bir fikir tanıtır.
-
-**Kurallar:**
-- Bir level'da **birden fazla yeni mekanik istifleme.**
-- Bir mekanikle ilk karşılaşma **fail edilemez** olmalı.
-- Zorluğu **recontextualize ederek** artır (twist), alakasız zorluk yığarak değil.
-- Her fikri, o beceriyi **gerektiren** bir "zafer turu" ile bitir = senin sınavın.
-- Fikir tamamlanınca **oyuncağı çöpe at**; aynı mekaniği yaydan sonra tekrar tekrar kullanmak padding hissi verir.
-
-> Etiketler (introduce/develop/twist/conclude) Mark Brown'ın çerçevelemesidir; "Dan Emmons" atıfı doğrulanmamıştır. Kaynak: Hayashida (Gamasutra) + GMTK.
-
-### Kishōtenketsu (çatışmasız 4-act)
-起承転結 — Mario level'larının iskeleti. **Çatışma gerektirmez**; gerilim kontrast ve keşiften gelir.
-- **Ki (起):** konuyu/ortamı kur. **Shō (承):** derinleştir/genişlet, sürpriz yok. **Ten (転):** beklenmedik, çoğu kez **alakasız** yeni öğe — eğrinin kalbi; her şeyi yeniden çerçeveler. **Ketsu (結):** Ki+Shō ile Ten'i tatmin edici bütünde **uzlaştır** (çatışma çözme değil).
-- **Önce Ten'i (twist) tasarla**, sonra giriş/gelişmeyi geriye doldur — tasarım emeği oraya yoğunlaşmalı.
-- Bir level'ı **düşman/fail baskısı olmadan** kurabilirsin — fikrin kendisi kahraman olsun.
-
-### "Teach, then test" (sözsüz öğretme)
-Introduce+Develop = **öğret** (güvenli pratik); Twist+Conclude = **sına** (baskı altında uygula). Çalışmasını sağlayan mekanizmalar: güvenli sandbox (fail imkânsız) · audiovisual affordance (tuğlaya vurunca zıpla+ses → etkileşilebilir) · ödül yerleşimi (istenen aksiyonu öğretecek konumda coin) · ucuz/telafi edilebilir ilk fail · ilerlemeden önce değerlendirme.
-
-### Vaka — Super Mario Bros. 1-1 (sıfır metin)
-Sağa koş (kontrastla göz yönlendirme) → ilk zıplama = ilk Goomba (ölçülü hızla reaksiyon süresi) → ? blok kazara vurulur (zıpla+ses+coin → ödül döngüsü) → mantar **sağ borudan sekip geri yuvarlanır**, oyuncuya çarpar (geometri büyümeyi **garanti eder**) → telegraflı küçük çukur → flagpole = "sınav". **Ders:** açılış ekranına tüm mekaniklerin mikrokozmosunu koy; kilit dersi **geometriyle zorla** (umma, inşa et); ilk fail'i ucuz yap; ilk seferde tehlikeyi cömertçe telegraph et, sonra marjları daralt.
+> 2D/casual/puzzle-specific application (levels-as-data, difficulty templates, tuning) → `08-level-design-for-2d-casual.md`. Difficulty curve/pacing theory → `03-difficulty-and-pacing.md`.
 
 ---
 
-## 2. Player guidance — sözsüz yönlendirme
+## 1. Level loop: Introduce → Develop → Twist → Conclude
 
-### Affordance vs Signifier (Norman, oyuna uyarlı)
-- **Affordance:** bir nesnenin formundan okunan, *yapılabilecek* şey (kenar tutunmayı, boşluk zıplamayı sunar).
-- **Signifier:** nerede/nasıl aksiyon alınacağını söyleyen **algılanabilir ipucu** (sarı boya, parıltı, ses). Norman: "tasarımcı için signifier'lar affordance'tan çok daha önemlidir." Hedef: *kapıya tabela koymana gerek kalmasın.*
-- Sanal nesneler dokunulamadığı için oyunlar signifier'a daha çok yaslanır.
+Nintendo's reusable single-mechanic structure (Koichi Hayashida; popularized in the West by Mark Brown/GMTK). **One level = one core idea.**
 
-### Gözü yönlendirme (en güvenilir araçlar)
-- **Kontrast** (parlaklık/renk/hareket) gözü istemsiz çeker. Yolu aydınlat, çıkmazı karart (Half-Life 2). 2D'de: hedef rotada daha parlak/kontrast tile'lar.
-- **Rezerve "rehber renk":** sönük palet üzerinde yalnızca yol/etkileşilebilir için kullanılan tek aksan (Mirror's Edge kırmızı, Uncharted sarı tutamaklar). Rengi **özel** tut (etkileşimsiz prop'a asla koyma) ve **renk körü güvenliği için ikinci kanalla** (şekil/parlaklık/outline) destekle.
-- **Leading lines:** geometriyi (boru, ray, tile kenarları, lav akışı) hedefe yakınsat. 2D'de katı tile'ların **şekli** senin leading line'ındır.
-- **Framing & reveal:** tünel çıkışını bir landmark'ı çerçeveleyecek konumlandır ("mağaradan çık, kaleyi gör").
-- **Hareket** en güçlü çekicidir (duman, ateş) — yalnızca bakılmasını istediğin şeyde, az kullan.
+1. **Introduce:** The new mechanic appears in a **safe, consequence-free** area; the player cannot die and discovers it through experimentation.
+2. **Develop:** The same mechanic in a slightly more complex scenario / mild risk.
+3. **Twist:** Recontextualize the mechanic — invert it, pair it with another element; force the player to "rethink." ("A doozy that surprises them.")
+4. **Conclude (mastery):** Usually right before the goal, a final challenge that **proves** the taught skill. Then **discard** the mechanic — the next level introduces a new idea.
 
-### Landmark / "weenie" ve breadcrumb
-- **Weenie** (Disney): ileri çeken uzun görsel mıknatıs. **Yoğunluk metriği:** yolculuk sırasında oyuncu **en az ~30 saniyede bir** bir şey tarafından çekilmeli — landmark aralığını buna göre ayarla.
-- **Breadcrumb:** kısa menzilli pickup izi (coin/ring); yerel yönlendirme için. Tehlikeli **görünen** bir yola breadcrumb döşemek tereddüdü kırar ("şıkırtıyı takip etmek ödüllendirir").
+**Rules:**
+- **Do not stack more than one new mechanic** in a single level.
+- The first encounter with a mechanic must be **fail-proof**.
+- Increase difficulty by **recontextualizing** (twist), not by piling on unrelated difficulty.
+- End every idea with a "victory lap" that **requires** that skill = your exam.
+- Once an idea is complete, **throw the toy away**; reusing the same mechanic over and over after the twist feels like padding.
+
+> The labels (introduce/develop/twist/conclude) are Mark Brown's framing; the "Dan Emmons" attribution is unverified. Source: Hayashida (Gamasutra) + GMTK.
+
+### Kishōtenketsu (conflict-free 4-act)
+起承転結 — the skeleton of Mario levels. **It requires no conflict**; tension comes from contrast and discovery.
+- **Ki (起):** establish the subject/setting. **Shō (承):** deepen/expand, no surprises. **Ten (転):** an unexpected, often **unrelated** new element — the heart of the curve; it reframes everything. **Ketsu (結):** **reconcile** Ten with Ki+Shō into a satisfying whole (not conflict resolution).
+- **Design the Ten (twist) first**, then backfill the intro/development — the design effort should concentrate there.
+- You can build a level **without enemy/fail pressure** — let the idea itself be the hero.
+
+### "Teach, then test" (wordless teaching)
+Introduce+Develop = **teach** (safe practice); Twist+Conclude = **test** (apply under pressure). The mechanisms that make it work: safe sandbox (failure impossible) · audiovisual affordance (hitting a brick makes it bounce+sound → interactable) · reward placement (a coin positioned to teach the desired action) · cheap/recoverable first fail · assessment before progression.
+
+### Case study — Super Mario Bros. 1-1 (zero text)
+Run right (eye-guided by contrast) → first jump = first Goomba (measured speed allowing reaction time) → ? block hit by accident (bounce+sound+coin → reward loop) → the mushroom **bounces off the right pipe and rolls back**, hitting the player (geometry **guarantees** the power-up) → telegraphed small pit → flagpole = "the exam." **Lesson:** put a microcosm of all the mechanics on the opening screen; **force** the key lesson with geometry (don't hope, build it); make the first fail cheap; telegraph danger generously the first time, then tighten the margins.
+
+---
+
+## 2. Player guidance — wordless direction
+
+### Affordance vs Signifier (Norman, adapted to games)
+- **Affordance:** what *can be done*, read from an object's form (a ledge affords grabbing, a gap affords jumping).
+- **Signifier:** a **perceptible cue** telling where/how to take action (yellow paint, glow, sound). Norman: "for the designer, signifiers are far more important than affordances." Goal: *you shouldn't need to put a sign on the door.*
+- Because virtual objects can't be touched, games lean more heavily on signifiers.
+
+### Guiding the eye (the most reliable tools)
+- **Contrast** (brightness/color/motion) draws the eye involuntarily. Light the path, darken the dead end (Half-Life 2). In 2D: brighter/higher-contrast tiles along the target route.
+- **Reserved "guide color":** a single accent used only for the path/interactables over a muted palette (Mirror's Edge red, Uncharted yellow handholds). Keep the color **exclusive** (never put it on a non-interactive prop) and back it with a **second channel for color-blind safety** (shape/brightness/outline).
+- **Leading lines:** converge geometry (pipes, rails, tile edges, lava flow) toward the goal. In 2D, the **shape** of the solid tiles is your leading line.
+- **Framing & reveal:** position a tunnel exit so it frames a landmark ("exit the cave, see the castle").
+- **Motion** is the strongest attractor (smoke, fire) — use it sparingly, only on what you want looked at.
+
+### Landmark / "weenie" and breadcrumb
+- **Weenie** (Disney): a tall visual magnet that pulls you forward. **Density metric:** during the journey the player should be pulled by something **at least every ~30 seconds** — set landmark spacing accordingly.
+- **Breadcrumb:** a short-range trail of pickups (coins/rings); for local guidance. Laying breadcrumbs onto a path that **looks** dangerous breaks hesitation ("following the jingle is rewarding").
 
 ### Environmental storytelling
-Mekânın kendisini anlatı olarak kullan; hikâye **çıkarsanır**, anlatılmaz. Oyuncunun boşluğu doldurması (closure) yatırımı yaratır. Teknikler: sahnelenmiş vinyetler, nedensel zincirler (kan izi), **environmental telegraphing** (kıvılcımlı ceset = elektrikli tehlike — aynı anda güvenlik öğretir). Kural: *her anonim çevre-anlatı anı, oyun hakkında bir şey söyleme fırsatını ziyan eder* — jenerik dekor yok.
+Use the space itself as narrative; the story is **inferred**, not told. The player filling the gap (closure) creates investment. Techniques: staged vignettes, causal chains (a blood trail), **environmental telegraphing** (a sparking corpse = electrical hazard — simultaneously teaches safety). Rule: *every anonymous environmental-narrative moment wastes a chance to say something about the game* — no generic décor.
 
 ---
 
 ## 3. Gating & locks/keys
 
-"Lock" = oyuncunun şu an geçemediği herhangi engel; "key" = onu aşan yetenek/eşya/**bilgi**. Mark Brown'ın *Boss Keys*'i her haritayı bir **graf** olarak çizer (oda=düğüm, bağlantı=kenar): okunur ama trivial-lineer değil — dallanır ve loop yapar.
+A "lock" = any obstacle the player can't currently pass; a "key" = the ability/item/**knowledge** that overcomes it. Mark Brown's *Boss Keys* charts every map as a **graph** (room=node, connection=edge): readable but not trivially-linear — it branches and loops.
 
-**Gate türleri (kesin sözlük kullan):**
+**Gate types (use precise vocabulary):**
 
-| Tür | Tanım |
+| Type | Definition |
 |---|---|
-| **Hard gate** | Tamamlamadan geçilmez |
-| **Soft gate** | Erken çıkılabilir ama genelde çıkılmaz |
-| **Lock-and-key** | Başka yerden gelen key isteyen hard gate |
-| **Forward gate** | Kritik yolu kapatır |
-| **Backward / one-way** | Geri dönülmez; akışı zorlar |
-| **Shortcut** | Uzak taraftan açılan hard gate (backtrack'i çökertir) |
-| **Hidden exit** | Çıkışı bulmak için keşif gerekir |
+| **Hard gate** | Cannot pass without completion |
+| **Soft gate** | Can leave early but usually doesn't |
+| **Lock-and-key** | A hard gate requiring a key from elsewhere |
+| **Forward gate** | Closes off the critical path |
+| **Backward / one-way** | No return; forces flow |
+| **Shortcut** | A hard gate opened from the far side (collapses backtracking) |
+| **Hidden exit** | Exploration required to find the exit |
 
-**Kurallar:** her engelin gate türünü **bilinçle** seç; **key'i vermeden önce lock'u foreshadow et** (erken gör, sonra dön); bir key birden çok takip yolunu açsın; **uzak-taraf shortcut'larıyla backtracking'i çökert** (akışı en çok iyileştiren yapı).
+**Rules:** **deliberately** choose the gate type of every obstacle; **foreshadow the lock before giving the key** (see it early, return later); let one key open multiple follow-up paths; **collapse backtracking with far-side shortcuts** (the structure that most improves flow).
 
-**Karmaşıklığı gate'le:** Teach → Test → Twist. Tek seferde tek yeni kavram (yeni mekanik + yeni tehlike + yeni düşmanı aynı anda sokma — oyuncuyu neyin öldürdüğü anlaşılmaz). Öğrenilen mekanikleri ancak her biri tek tek kanıtlandıktan sonra birleştir.
-
----
-
-## 4. Pacing — gerilim/dinlenme ritmi (level içi)
-
-- **Intensity** = tek olayın heyecanı; **pacing** = doruklar arası zamanlama.
-- **Kontrast kuralı:** düz yoğunluk sıkar; *sürekli* maksimum yoğunluk uyuşturur ("11 sürekli açıksa, 11 yeni 5 olur"). Çukurlar bir sonraki doruğu hissettirir.
-- **Sawtooth:** zarfı yükselen, dişleri korunan doruk/çukur dizisi. Pürüzsüz rampa istenmez — kontrastı yoktur.
-- **Rest beat = mühendislik aracı:** boss sonrası garanti bir düşük-yoğunluk/ödül aralığı koy. Rest = aktivitesizlik değil; göreceli düşüş (güvenli oda, traversal, loot anı).
-- **Önce intensity grafiğini çiz:** doruğu kesin planla, çukuru kabaca yerleştir, hikâye/ödül beat'lerini **doruklara** koy.
-- Tür kabaca tension:rest oranı — horror ~3:1, komedi ~1:1, aksiyon arası.
-- **Çeşitlilik:** zorluğun türünü de değiştir (combat → puzzle → traversal); tekrar = sıkıntı.
+**Gate complexity:** Teach → Test → Twist. One new concept at a time (don't introduce a new mechanic + new hazard + new enemy at once — the player can't tell what killed them). Combine learned mechanics only after each has been individually proven.
 
 ---
 
-## 5. Süreç: pen&paper → blockout → playtest
+## 4. Pacing — tension/rest rhythm (within a level)
 
-Roller (büyük stüdyo): Level Designer (etkileşim) · Level Artist · Environment/Lighting Artist · Encounter Designer. Solo'da hepsi sende — ama **aşamaları ayrı tut.**
-
-1. **Pen & paper (kavram):** motor kısıtı olmadan düşün; mekanikleri, bölgeleri, ilerlemeyi netleştir. Steve Lee: level'ı **önce metinle** tasarla.
-2. **Blockout / greybox (prototip):** sıfır yeni sanat; primitive geometri ile **oynanabilir**. İdeal blockout: kurallara göre oynanır · net navigasyon/landmark · kritik yol vs yan içerik tanımlı · hem top-down hem oyuncu-bakışından okunur. **Graybox** = imza-sanatsız soyut blocking (esneklik); **whitebox** = bağlamı veren silüet/anahtar sanatla.
-3. **Metrics:** ölçeği bir **insan-figürü referansıyla** sabitle (geçitler ne çok dar ne mağaramsı). 2D'de: tile/grid boyutu, zıplama menzili, oyuncu hızı = level'ı yöneten metrikler.
-4. **Playtest (her aşamada):** taze oyuncuyla; **brief verme, kesme, kişisel alma.** Söylediğini değil **yaptığını** gözle (tereddüt, takılma, ölüm, çıkış). Önerilen çözüm yanlış olabilir ama *işaret ettiği sorun neredeyse her zaman gerçektir.*
-5. **Sanat en son:** layout birden çok playtest'ten değişmeden geçince. *Kaba blockout'u silmek ucuz; art-pass'lenmiş işi atmak pahalı.*
-
----
-
-## 6. Sık hatalar (fun-killer'lar)
-
-- **Landmark'sız labirentler** (#1 okunabilirlik katili). · **Haksız/okunamaz ölümler** (gizli diken, ekran-dışı instakill). · **Metin duvarları** (metinle açıklamak zorundaysan tasarım öğretemedi). · **Yönsüz sandbox** (açık alan + çekim yok = felç). · **Difficulty spike'ları** (introduce-test-combine'dan önce). · **Çıkmazlar / anlamsız koridorlar** ("kâğıtta iyi, yürürken sürünüyor" — level'ı her zaman **oyuncu hızında yürü**, editör kamerasından yargılama). · **Monotonluk.** · **Layout çalışmadan sanat üretmek** (en pahalı hata).
+- **Intensity** = the excitement of a single event; **pacing** = the timing between peaks.
+- **Contrast rule:** flat intensity bores; *constant* maximum intensity numbs ("if 11 is always on, 11 becomes the new 5"). Valleys make the next peak felt.
+- **Sawtooth:** a sequence of peaks/valleys with a rising envelope but preserved teeth. A smooth ramp is undesirable — it has no contrast.
+- **Rest beat = an engineering tool:** place a guaranteed low-intensity/reward interval after a boss. Rest ≠ inactivity; it's a relative drop (a safe room, traversal, a loot moment).
+- **Draw the intensity graph first:** plan the peaks precisely, place the valleys roughly, put story/reward beats **on the peaks**.
+- Genre roughly sets the tension:rest ratio — horror ~3:1, comedy ~1:1, action in between.
+- **Variety:** also vary the *type* of difficulty (combat → puzzle → traversal); repetition = boredom.
 
 ---
 
-## Tek-sayfa özet (2D level inşası)
+## 5. Process: pen&paper → blockout → playtest
 
-1. Level başına **tek mekanik**: Introduce(güvenli)→Develop→Twist(recombine)→Conclude(ustalık)→at.
-2. **Metinle değil**; geometri, ödül ve feedback ile öğret. Açılışa mikrokozmos koy, kilit dersi geometriyle zorla.
-3. **Gözü yönlendir:** kontrast/parlaklık, rezerve rehber renk (+ikinci kanal), tile-şekli leading line, framing.
-4. **Weenie yoğunluğu:** ~30 sn'de bir bir şey çeksin.
-5. Her engelin **gate türünü** adlandır; lock'u key'den önce foreshadow et; shortcut'la backtrack'i çökert.
-6. **Önce intensity grafiği** — kesin doruk, kaba çukur, ödül doruklarda; rest beat bir araçtır.
-7. **Önce blockout** (massing, metrics+figür, wayfinding, playtest). Level'ı **yürü, uçma.**
-8. **Taze oyuncuyla playtest;** brief/kesme/alınma yok; feedback'in işaret ettiği sorun gerçektir.
-9. Labirent/haksız ölüm/çıkmaz/monotonluğu öldür; golden path okunur, keşif onun yanında.
+Roles (large studio): Level Designer (interaction) · Level Artist · Environment/Lighting Artist · Encounter Designer. Solo, all of these are you — but **keep the phases separate.**
+
+1. **Pen & paper (concept):** think without engine constraints; clarify the mechanics, regions, and progression. Steve Lee: design the level **in text first**.
+2. **Blockout / greybox (prototype):** zero new art; **playable** with primitive geometry. The ideal blockout: plays by the rules · clear navigation/landmarks · critical path vs side content defined · readable from both top-down and player view. **Graybox** = abstract blocking with no signature art (flexibility); **whitebox** = with silhouette/key art that gives context.
+3. **Metrics:** anchor the scale with a **human-figure reference** (passages neither too narrow nor cavernous). In 2D: tile/grid size, jump range, player speed = the metrics that govern the level.
+4. **Playtest (at every phase):** with a fresh player; **no briefing, no interrupting, no taking it personally.** Watch what they **do**, not what they say (hesitation, getting stuck, dying, quitting). Their proposed fix may be wrong, but *the problem it points to is almost always real.*
+5. **Art last:** once the layout survives multiple playtests unchanged. *Deleting a rough blockout is cheap; throwing away art-passed work is expensive.*
 
 ---
 
-## Kaynaklar
+## 6. Common mistakes (fun-killers)
+
+- **Landmark-less mazes** (the #1 readability killer). · **Unfair/unreadable deaths** (hidden spike, off-screen instakill). · **Walls of text** (if you have to explain it with text, the design failed to teach). · **Directionless sandbox** (open space + no pull = paralysis). · **Difficulty spikes** (before introduce-test-combine). · **Dead ends / pointless corridors** ("good on paper, crawls on foot" — always **walk the level at player speed**, don't judge from the editor camera). · **Monotony.** · **Producing art before the layout works** (the most expensive mistake).
+
+---
+
+## One-page summary (2D level construction)
+
+1. **One mechanic per level**: Introduce(safe)→Develop→Twist(recombine)→Conclude(mastery)→discard.
+2. Teach **not with text** but with geometry, reward, and feedback. Put a microcosm in the opening, force the key lesson with geometry.
+3. **Guide the eye:** contrast/brightness, a reserved guide color (+second channel), tile-shape leading lines, framing.
+4. **Weenie density:** something should pull every ~30 sec.
+5. Name the **gate type** of every obstacle; foreshadow the lock before the key; collapse backtracking with shortcuts.
+6. **Intensity graph first** — precise peaks, rough valleys, rewards on the peaks; the rest beat is a tool.
+7. **Blockout first** (massing, metrics+figure, wayfinding, playtest). **Walk** the level, don't fly.
+8. **Playtest with a fresh player;** no briefing/interrupting/taking offense; the problem the feedback points to is real.
+9. Kill mazes/unfair deaths/dead ends/monotony; the golden path is readable, exploration sits beside it.
+
+---
+
+## Sources
 
 - The secret to Mario level design — Game Developer: https://www.gamedeveloper.com/design/the-secret-to-i-mario-i-level-design
 - Kishōtenketsu in Mario — Still Eating Oranges: https://stilleatingoranges.tumblr.com/post/76178051254/kish%C5%8Dtenketsu-in-mario

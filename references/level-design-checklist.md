@@ -1,48 +1,48 @@
-# Level / Wave Tasarım Kontrol Listesi
+# Level / Wave Design Checklist
 
-Bir level (veya real-time oyunda wave/zone) tasarlarken bu listeyi geç. Teori: `references/game-design/02`, `03`, `08`.
+Run through this list when designing a level (or a wave/zone in a real-time game). Theory: `references/game-design/02`, `03`, `08`.
 
-## Önce tasarla (kod öncesi)
-- [ ] Bu level'ın **tek net amacı** var mı? (bir mekanik öğret / bir düşman tanıt / bir hikâye/ödül beat'i ver — asla "dolgu" değil)
-- [ ] Hedef estetik(ler) ve pillar'larla uyumlu mu?
-- [ ] **Tek yeni fikir** mi? (yeni mekanik + yeni tehlike + yeni düşmanı aynı anda sokma)
+## Design first (before code)
+- [ ] Does this level have **one clear purpose**? (teach a mechanic / introduce an enemy / deliver a story/reward beat — never "filler")
+- [ ] Is it aligned with the target aesthetic(s) and pillars?
+- [ ] Is it **a single new idea**? (don't introduce a new mechanic + new hazard + new enemy at the same time)
 
-## Teach → Test → Twist (tek-mekanik yayı)
-- [ ] **Introduce:** yeni öğe **güvenli/fail-edilemez** alanda tanıtılıyor mu?
-- [ ] **Develop:** hafif riskle geliştiriliyor mu?
-- [ ] **Twist:** mekanik recontextualize ediliyor mu (alakasız zorluk yığma değil)?
-- [ ] **Conclude:** öğretilen beceriyi gerektiren bir final/zafer turu var mı?
-- [ ] Fikir bitince mekanik **bırakılıyor** mu (padding yok)?
+## Teach → Test → Twist (single-mechanic arc)
+- [ ] **Introduce:** is the new element introduced in a **safe/fail-proof** space?
+- [ ] **Develop:** is it developed with mild risk?
+- [ ] **Twist:** is the mechanic recontextualized (not piling on unrelated difficulty)?
+- [ ] **Conclude:** is there a finale/victory lap that requires the skill you taught?
+- [ ] When the idea is exhausted, is the mechanic **dropped** (no padding)?
 
-## Zorluk & pacing
-- [ ] Genel eğri **sawtooth** mı (tırman→bilerek düşür→tırman), düz rampa değil?
-- [ ] Her **spike'tan sonra çukur/relief** var mı?
-- [ ] Açılış **kontrol spike**'ından kaçınılıyor mu (az buton, bilinen beceri)?
-- [ ] Oyuncu becerisinin yaşam-boyu artışına göre **yeniden kalibre** edildi mi (level 100 ≠ level 1000)?
-- [ ] Oturum interest curve'ü: hook → yükselen beat'ler → doruk → çekiş?
+## Difficulty & pacing
+- [ ] Is the overall curve **sawtooth** (climb→deliberately dip→climb), not a flat ramp?
+- [ ] Is there a **trough/relief after every spike**?
+- [ ] Is the opening **control spike** avoided (few buttons, known skill)?
+- [ ] Is it **recalibrated** to the player's lifetime skill growth (level 100 ≠ level 1000)?
+- [ ] Session interest curve: hook → rising beats → peak → pull?
 
-## Player guidance (sözsüz)
-- [ ] Metinle değil **geometri/feedback/ödül** ile mi öğretiyor?
-- [ ] Göz, **kontrast + rezerve rehber renk** (+ renk körü için ikinci kanal) ile yönlendiriliyor mu?
-- [ ] **Golden path okunur** mu; keşif onun yanında ödüllendiriliyor mu?
-- [ ] Weenie/landmark yoğunluğu: ~30 sn'de bir bir şey çekiyor mu?
+## Player guidance (wordless)
+- [ ] Does it teach with **geometry/feedback/reward** rather than text?
+- [ ] Is the eye guided with **contrast + a reserved guide color** (+ a second channel for color-blind players)?
+- [ ] Is the **golden path readable**; is exploration rewarded alongside it?
+- [ ] Weenie/landmark density: does something pull you roughly every ~30 sec?
 
 ## Gating
-- [ ] Her engelin **gate türü** bilinçli mi (hard/soft/lock-key/one-way/shortcut/hidden)?
-- [ ] **Key'den önce lock foreshadow** ediliyor mu?
-- [ ] Backtracking varsa **shortcut** ile çökertilmiş, dönüş **anlamlı ödülle** mi?
+- [ ] Is each obstacle's **gate type** deliberate (hard/soft/lock-key/one-way/shortcut/hidden)?
+- [ ] Is the **lock foreshadowed before the key**?
+- [ ] If there is backtracking, is it collapsed with a **shortcut**, and is the return paired with a **meaningful reward**?
 
-## Levels-as-data (uygulama)
-- [ ] Level **config/JSON** olarak mı (hardcode değil)? Tek generic `LevelConfig` + loader?
-- [ ] Zorluk küçük bir **parametre setiyle** mi ayarlanıyor (moves/objective/board/blocker/allowed)?
-- [ ] Real-time ise wave parametreleri (sayı, aralık, HP/hız ölçeği, boss kadansı) config'te mi?
+## Levels-as-data (implementation)
+- [ ] Is the level **config/JSON** (not hardcoded)? One generic `LevelConfig` + loader?
+- [ ] Is difficulty tuned with a small **parameter set** (moves/objective/board/blocker/allowed)?
+- [ ] If real-time, are the wave parameters (count, interval, HP/speed scale, boss cadence) in config?
 
 ## Game feel
-- [ ] Her oyuncu aksiyonunun anında, çok-duyulu feedback'i (görsel+ses) var mı?
-- [ ] Önemli darbe/öldürmede juice (screenshake/hit-stop/flash/partikül) var mı, abartısız?
+- [ ] Does every player action have immediate, multi-sensory feedback (visual+audio)?
+- [ ] On an important hit/kill, is there juice (screenshake/hit-stop/flash/particles), without overdoing it?
 
-## Doğrulama
-- [ ] Level **oyuncu hızında yürünüp/oynanıp** doğrulandı mı (editör kamerasından değil)?
-- [ ] Mümkünse **taze oyuncuyla** playtest; davranış gözlendi mi (tereddüt/takılma/çıkma)?
-- [ ] Telemetri: level/wave başına **deneme + drop-off** enstrümante mi?
-- [ ] Sık hatalar elendi mi: labirent, haksız ölüm, çıkmaz, monotonluk, yönsüz sandbox?
+## Verification
+- [ ] Was the level verified by **walking/playing it at player speed** (not from the editor camera)?
+- [ ] If possible, playtested with a **fresh player**; was behavior observed (hesitation/getting stuck/quitting)?
+- [ ] Telemetry: are **attempts + drop-off** instrumented per level/wave?
+- [ ] Have the common mistakes been eliminated: maze, unfair death, dead end, monotony, directionless sandbox?

@@ -1,32 +1,32 @@
-# Flame: Efektler ve Partiküller
+# Flame: Effects and Particles
 
-Bu doküman Flame'in efekt sistemi (`Effect`, `EffectController` ve somut efektler) ile partikül sistemini kapsar.
+This document covers Flame's effect system (`Effect`, `EffectController`, and concrete effects) along with the particle system.
 
-## 1. Efekt Temelleri
+## 1. Effect Basics
 
-Efekt, başka bir component'e iliştirilerek onun özelliklerini veya görünümünü zaman içinde değiştiren özel bir component'tir. Soyut `Effect` sınıfı ortak işlevselliği sağlar:
+An effect is a special component that, when attached to another component, changes its properties or appearance over time. The abstract `Effect` class provides the common functionality:
 
-- **Duraklatma/devam:** `effect.pause()`, `effect.resume()`, durum: `effect.isPaused`
-- **Otomatik kaldırma:** `removeOnFinish` (varsayılan `true`) bitince efekt component'ini kaldırır
-- **Tamamlanma callback'i:** opsiyonel `onComplete`, efekt bitince (kaldırılmadan önce) çalışır
-- **Tamamlanma future'ı:** `completed` future'ı efekt bittiğinde çözülür
-- **Sıfırlama:** `reset()` ile yeniden kullanım için başlangıç durumuna döner
+- **Pause/resume:** `effect.pause()`, `effect.resume()`, state: `effect.isPaused`
+- **Auto-removal:** `removeOnFinish` (defaults to `true`) removes the effect component when it finishes
+- **Completion callback:** the optional `onComplete` runs when the effect finishes (before removal)
+- **Completion future:** the `completed` future resolves when the effect finishes
+- **Reset:** `reset()` returns to the initial state for reuse
 
 ## 2. EffectController
 
-`EffectController`, efektin zaman içindeki ilerleyişini tanımlar. Standart factory constructor parametreleri:
+`EffectController` defines how the effect progresses over time. Standard factory constructor parameters:
 
-- `duration` (zorunlu): 0→%100 ilerleme süresi (saniye)
-- `curve`: doğrusal olmayan ilerleme (varsayılan `Curves.linear`)
-- `reverseDuration`: ters aşama süresi (%100→0)
-- `reverseCurve`: ters aşama eğrisi (varsayılan `curve.flipped`)
-- `alternate`: `reverseDuration == duration` ile eşdeğer boolean
-- `atMaxDuration`: %100'de bekleme süresi
-- `atMinDuration`: %0'da bekleme süresi
-- `repeatCount`: tekrar sayısı
-- `infinite`: sonsuz tekrar boolean
-- `startDelay`: başlamadan önce bekleme süresi
-- `onMax` / `onMin`: maksimum/minimum ilerlemede callback
+- `duration` (required): the 0→100% progress duration (seconds)
+- `curve`: nonlinear progression (defaults to `Curves.linear`)
+- `reverseDuration`: the reverse-phase duration (100%→0)
+- `reverseCurve`: the reverse-phase curve (defaults to `curve.flipped`)
+- `alternate`: a boolean equivalent to `reverseDuration == duration`
+- `atMaxDuration`: the hold time at 100%
+- `atMinDuration`: the hold time at 0%
+- `repeatCount`: the number of repeats
+- `infinite`: an infinite-repeat boolean
+- `startDelay`: the wait time before starting
+- `onMax` / `onMin`: callbacks at maximum/minimum progress
 
 ```dart
 EffectController(
@@ -39,37 +39,37 @@ EffectController(
 );
 ```
 
-### Özelleşmiş controller'lar
+### Specialized controllers
 
-| Controller | Amaç |
+| Controller | Purpose |
 |---|---|
-| `LinearEffectController(duration)` | Doğrusal 0→1 |
-| `ReverseLinearEffectController(duration)` | Doğrusal 1→0 |
-| `CurvedEffectController(duration, curve)` | Eğrili 0→1 |
-| `ReverseCurvedEffectController(duration, curve)` | Eğrili 1→0 |
-| `PauseEffectController(duration, progress)` | Sabit ilerleme |
-| `RepeatedEffectController(child, count)` | Child'ı N kez tekrarlar |
-| `InfiniteEffectController(child)` | Child'ı sonsuz tekrarlar |
-| `SequenceEffectController([...])` | Controller'ları sırayla zincirler |
-| `SpeedEffectController(child, speed)` | Hıza göre süreyi ayarlar |
-| `DelayedEffectController(child, delay)` | Child'ı geciktirir |
-| `ZigzagEffectController(period)` | 0→1→-1→0 salınımı |
-| `SineEffectController(period)` | Tek sinüs periyodu |
-| `NoiseEffectController(duration, frequency)` | Rastgele salınım |
-| `RandomEffectController.uniform(child, min, max)` | Rastgele süre sarmalayıcı |
+| `LinearEffectController(duration)` | Linear 0→1 |
+| `ReverseLinearEffectController(duration)` | Linear 1→0 |
+| `CurvedEffectController(duration, curve)` | Curved 0→1 |
+| `ReverseCurvedEffectController(duration, curve)` | Curved 1→0 |
+| `PauseEffectController(duration, progress)` | Constant progress |
+| `RepeatedEffectController(child, count)` | Repeats the child N times |
+| `InfiniteEffectController(child)` | Repeats the child infinitely |
+| `SequenceEffectController([...])` | Chains controllers in sequence |
+| `SpeedEffectController(child, speed)` | Sets the duration based on speed |
+| `DelayedEffectController(child, delay)` | Delays the child |
+| `ZigzagEffectController(period)` | 0→1→-1→0 oscillation |
+| `SineEffectController(period)` | A single sine period |
+| `NoiseEffectController(duration, frequency)` | Random oscillation |
+| `RandomEffectController.uniform(child, min, max)` | Random-duration wrapper |
 
-## 3. Move Efektleri
+## 3. Move Effects
 
-`MoveEffect.by` (göreli) ve `MoveEffect.to` (mutlak). Alttaki sınıflar `MoveByEffect` ve `MoveToEffect`.
+`MoveEffect.by` (relative) and `MoveEffect.to` (absolute). The underlying classes are `MoveByEffect` and `MoveToEffect`.
 
 ```dart
-// Mevcut konuma göre kaydır
+// Shift relative to the current position
 final moveBy = MoveEffect.by(
   Vector2(30, 30),
   EffectController(duration: 1.0),
 );
 
-// Belirli bir hedefe git
+// Go to a specific target
 final moveTo = MoveEffect.to(
   Vector2(100, 500),
   EffectController(duration: 3),
@@ -78,7 +78,7 @@ final moveTo = MoveEffect.to(
 
 ### MoveAlongPathEffect
 
-Component'i belirtilen yol boyunca hareket ettirir. `absolute: true` mutlak canvas koordinatları, `oriented: true` hedefi yola göre döndürür.
+Moves the component along the specified path. `absolute: true` uses absolute canvas coordinates; `oriented: true` rotates the target to follow the path.
 
 ```dart
 final pathEffect = MoveAlongPathEffect(
@@ -88,27 +88,27 @@ final pathEffect = MoveAlongPathEffect(
 );
 ```
 
-## 4. Scale Efektleri
+## 4. Scale Effects
 
-`ScaleEffect.by` (göreli), `ScaleEffect.to` (mutlak). Scale tüm child component'leri etkiler (size yalnızca parent boyutunu).
+`ScaleEffect.by` (relative), `ScaleEffect.to` (absolute). Scale affects all child components (size affects only the parent's dimensions).
 
 ```dart
-// %50 büyüt
+// Grow by 50%
 final scaleBy = ScaleEffect.by(
   Vector2.all(1.5),
   EffectController(duration: 0.3),
 );
 
-// Mutlak ölçeğe ayarla
+// Set to an absolute scale
 final scaleTo = ScaleEffect.to(
   Vector2.all(0.5),
   EffectController(duration: 0.5),
 );
 ```
 
-## 5. Rotate Efektleri
+## 5. Rotate Effects
 
-Açı **radyan** cinsindendir (`tau/4` = 90°). Yön referansı: 0º = kuzey, tau/4 = doğu.
+The angle is in **radians** (`tau/4` = 90°). Direction reference: 0º = north, tau/4 = east.
 
 ```dart
 final rotateBy = RotateEffect.by(
@@ -122,11 +122,11 @@ final rotateTo = RotateEffect.to(
 );
 ```
 
-## 6. Opacity ve Color Efektleri
+## 6. Opacity and Color Effects
 
-`OpacityEffect`, yalnızca `OpacityProvider` arabirimini uygulayan component'lere uygulanabilir. `HasPaint` mixin'i `OpacityProvider`'ı uygular. Opacity 0 = tam saydam, 1 = tam opak.
+`OpacityEffect` can only be applied to components that implement the `OpacityProvider` interface. The `HasPaint` mixin implements `OpacityProvider`. Opacity 0 = fully transparent, 1 = fully opaque.
 
-`OpacityEffect.to(double, controller)`, `OpacityEffect.fadeOut(controller)` (tam saydamlığa) ve `OpacityEffect.fadeIn(controller)` (tam görünürlüğe).
+`OpacityEffect.to(double, controller)`, `OpacityEffect.fadeOut(controller)` (to full transparency), and `OpacityEffect.fadeIn(controller)` (to full visibility).
 
 ```dart
 class MyComponent extends SpriteComponent with HasPaint {
@@ -140,7 +140,7 @@ final toHalf = OpacityEffect.to(0.5, EffectController(duration: 0.75));
 
 ### ColorEffect
 
-Component'i bir renge boyar. **Not:** Flutter'ın `ColorFilter` yapısı nedeniyle birden çok `ColorEffect` birlikte kullanılamaz; yalnızca sonuncusu etkili olur.
+Tints the component with a color. **Note:** Due to Flutter's `ColorFilter` structure, multiple `ColorEffect`s cannot be used together; only the last one takes effect.
 
 ```dart
 final colorEffect = ColorEffect(
@@ -153,7 +153,7 @@ final colorEffect = ColorEffect(
 
 ## 7. SequenceEffect
 
-Birden çok efekti sırayla çalıştırır. Constituent efektler farklı tiplerde olabilir. `alternate: true` (controller üzerinde) ileri-geri çalıştırır; tekrar `repeatCount` veya `infinite` ile kontrol edilir.
+Runs multiple effects in sequence. The constituent effects can be of different types. `alternate: true` (on the controller) runs it back and forth; repetition is controlled with `repeatCount` or `infinite`.
 
 ```dart
 final effect = SequenceEffect([
@@ -175,21 +175,21 @@ final effect = SequenceEffect([
 add(effect);
 ```
 
-Efektin tamamlanmasını dinleme:
+Listening for the effect to complete:
 
 ```dart
 final effect = MoveEffect.by(
   Vector2(0, -100),
   EffectController(duration: 1.0),
-  onComplete: () => print('hareket bitti'),
+  onComplete: () => print('move complete'),
 );
 add(effect);
 await effect.completed;
 ```
 
-## 8. Partikül Sistemi
+## 8. Particle System
 
-Partikül sistemi `Particle` sınıfı etrafında döner. `ParticleSystemComponent`, Component yaşam döngüsü kancalarını Particle'a eşler ve bitince component'i kaldırır.
+The particle system revolves around the `Particle` class. `ParticleSystemComponent` maps the Component lifecycle hooks onto the Particle and removes the component when it finishes.
 
 ```dart
 import 'package:flame/components.dart';
@@ -203,7 +203,7 @@ game.add(
 
 ### Particle.generate
 
-Birden çok partikül örneği üretir.
+Generates multiple particle instances.
 
 ```dart
 final rnd = Random();
@@ -226,39 +226,39 @@ game.add(
 
 ### Lifespan
 
-Tüm partiküller saniye cinsinden `lifespan` alır (mikrosaniye hassasiyet). `setLifespan()` sıfırlar, `progress` getter'ı 0.0–1.0 arası ömrü izler.
+All particles take a `lifespan` in seconds (microsecond precision). `setLifespan()` resets it, and the `progress` getter tracks the lifetime in the range 0.0–1.0.
 
 ```dart
-final particle = CircleParticle()..setLifespan(2); // 2 saniye
+final particle = CircleParticle()..setLifespan(2); // 2 seconds
 ```
 
-### Yaygın partikül tipleri
+### Common particle types
 
 ```dart
-// Sabit konuma çevirir (konumu değiştirmeden)
+// Translates to a fixed position (without changing the position)
 TranslatedParticle(offset: game.size / 2, child: Particle());
 
-// from -> to arası hareket ettirir
+// Moves between from -> to
 MovingParticle(
   from: Vector2.zero(),
   to: game.size,
   child: CircleParticle(radius: 2.0, paint: Paint()..color = Colors.red),
 );
 
-// Fizik tabanlı (position, speed, acceleration -> logical px/s)
+// Physics-based (position, speed, acceleration -> logical px/s)
 AcceleratedParticle(
   position: game.canvasSize / 2,
   speed: Vector2(rnd.nextDouble() * 200 - 100, -rnd.nextDouble() * 100),
   child: CircleParticle(radius: 2.0, paint: Paint()..color = Colors.red),
 );
 
-// Daire çizer
+// Draws a circle
 CircleParticle(
   radius: game.size.x / 2,
   paint: Paint()..color = Colors.red.withValues(alpha: .5),
 );
 
-// 1 -> to arası ölçekler
+// Scales between 1 -> to
 ScalingParticle(
   lifespan: 2,
   to: 0,
@@ -266,24 +266,24 @@ ScalingParticle(
   child: CircleParticle(radius: 2.0, paint: Paint()..color = Colors.red),
 );
 
-// Sprite gömer
+// Embeds a sprite
 SpriteParticle(sprite: mySprite, size: Vector2(64, 64));
 
-// dart:ui Image gömer
+// Embeds a dart:ui Image
 ImageParticle(size: Vector2.all(24), image: image);
 
-// SpriteAnimation oynatır
+// Plays a SpriteAnimation
 SpriteAnimationParticle(
   animation: spriteSheet.createAnimation(0, stepTime: 0.1),
 );
 
-// Component gömer (kendi update/render'ı ile)
+// Embeds a Component (with its own update/render)
 ComponentParticle(component: longLivingRect);
 ```
 
 ### ComputedParticle
 
-Tam özel render için. `progress` ile zaman bazlı interpolasyon yapılır.
+For fully custom rendering. Time-based interpolation is done via `progress`.
 
 ```dart
 game.add(
@@ -300,9 +300,9 @@ game.add(
 );
 ```
 
-### Kompozisyon ve iç içe yerleştirme
+### Composition and nesting
 
-Flame, Flutter widget'larına benzer kompozisyon kullanır. Özel partiküller için `SingleChildParticle` mixin'i, çoklu davranış birleştirme için `ComposedParticle` kullanılır.
+Flame uses composition similar to Flutter widgets. For custom particles, use the `SingleChildParticle` mixin; for combining multiple behaviors, use `ComposedParticle`.
 
 ```dart
 final rnd = Random();
@@ -323,7 +323,7 @@ class GlitchParticle extends Particle with SingleChildParticle {
 }
 ```
 
-## Kaynaklar
+## Resources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/effects/effects.md
 - https://docs.flame-engine.org/latest/flame/effects/move_effects.html

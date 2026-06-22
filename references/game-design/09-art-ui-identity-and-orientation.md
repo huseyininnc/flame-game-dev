@@ -1,114 +1,114 @@
-# Per-Game Design Identity — Tema, UI/HUD, Tipografi, Orientation (ZORUNLU)
+# Per-Game Design Identity — Theme, UI/HUD, Typography, Orientation (MANDATORY)
 
-> **Her oyun KENDİ markası gibi görünmeli — bir öncekinin reskin'i DEĞİL.** Düşman: "üst stat-pill'ler + alt bar + aynı yuvarlak font + aynı palet"i her oyuna uygulamak. Tema, UI, HUD düzeni, font, palet, hareket kişiliği ve **çekirdek mekanik** oyunun içeriğine göre değişmeli. Orientation (portrait/landscape) da oyuna göre seçilir.
+> **Each game must look like ITS OWN brand — NOT a reskin of the previous one.** The enemy: applying "top stat-pills + bottom bar + the same rounded font + the same palette" to every game. Theme, UI, HUD layout, font, palette, motion personality, and the **core mechanic** must vary with the game's content. Orientation (portrait/landscape) is also chosen per game.
 
-**Mutlak kural:** Oyunlar arası **ortak `overlay_widgets`/HUD/palette/font yeniden kullanımı YOK.** Kod konvansiyonları (mimari, Bloc, pooling, responsive disiplini) paylaşılır; **görsel/etkileşim kimliği paylaşılmaz.** Marka testi (§6) geçilmeden oyun "done" sayılmaz.
+**Absolute rule:** **NO shared reuse of `overlay_widgets`/HUD/palette/font across games.** Code conventions (architecture, Bloc, pooling, responsive discipline) are shared; **visual/interaction identity is not.** A game is not "done" until the brand test (§6) passes.
 
 ---
 
-## 1. HUD diegesis taksonomisi (Fagerholt & Lorentzon) — önce bunu seç
+## 1. HUD diegesis taxonomy (Fagerholt & Lorentzon) — choose this first
 
-İki eksen: **kurgu** (karakter farkında mı?) × **geometri** (dünyada mı, düz overlay mı?).
+Two axes: **fiction** (is the character aware?) × **geometry** (in the world, or a flat overlay?).
 
-| | Kurgu içi (karakter farkında) | Kurgu dışı (sadece oyuncu) |
+| | In-fiction (character aware) | Out-of-fiction (player only) |
 |---|---|---|
-| **Dünya geometrisinde** | **Diegetic** (Dead Space sırt canı) | **Spatial** (duvar arkası parıltı, waypoint) |
-| **Düz overlay** | **Meta** (kan sıçraması, düşük-can vignette) | **Non-diegetic** (klasik HUD bar/pill) |
+| **In world geometry** | **Diegetic** (Dead Space back-mounted health) | **Spatial** (glow behind a wall, waypoint) |
+| **Flat overlay** | **Meta** (blood splatter, low-health vignette) | **Non-diegetic** (classic HUD bar/pill) |
 
-- **Diegetic:** maksimum immersion, yüksek maliyet, küçük ölçekte okunabilirlik riski; preproduction'da karar ver.
-- **Non-diegetic:** en ucuz/net, en az immersion; bilgi-yoğun/strateji/top-down için iyi — ama dünyanın görsel diline bürünsün, context'e göre sönüp açılsın.
-- **Spatial:** navigasyon/çok-oyunculu farkındalık; aşırı kullanım görsel gürültü.
-- **Meta:** ekran efektiyle duygu; **daima erişilebilirlik toggle'ı**, can en düşükken bilgiyi gizleyen ağır distortion yapma.
+- **Diegetic:** maximum immersion, high cost, readability risk at small scale; decide in preproduction.
+- **Non-diegetic:** the cheapest/clearest, the least immersive; good for information-dense/strategy/top-down — but it should adopt the world's visual language and fade in/out by context.
+- **Spatial:** navigation/multiplayer awareness; overuse becomes visual noise.
+- **Meta:** emotion via screen effects; **always an accessibility toggle**, don't apply heavy distortion that hides information when health is lowest.
 
-**Distinctness kuralı:** Her yeni oyuna **bir öncekinden FARKLI birincil diegesis** ata. (Ör. A = meta-ağırlıklı / neredeyse overlay yok; B = diegetic in-world readout; C = context-fading non-diegetic.) Aynı mekanik bile olsa samey olamaz.
+**Distinctness rule:** assign each new game a **different primary diegesis from the previous one**. (E.g. A = meta-heavy / almost no overlay; B = diegetic in-world readout; C = context-fading non-diegetic.) Even with the same mechanic, it can't be samey.
 
 ---
 
-## 2. Türüne göre HUD düzeni
+## 2. HUD layout by genre
 
-İlke: hızlı oyun → minimal, glanceable, kenara yaslı; yavaş oyun → katmanlı bilgi. **Refleks "köşeye doldur"dan kaç** — sık değişen kritik bilgiyi merkeze yakın veya diegetic yap; köşe yalnızca beynin filtrelediği statik bilgi için.
+Principle: fast game → minimal, glanceable, edge-aligned; slow game → layered information. **Avoid the reflexive "fill the corners"** — make frequently-changing critical information near-center or diegetic; the corner is only for static information the brain filters out.
 
-| Tür | Bilgi nerede | Miktar | Girdi | Ayırt edici hamle |
+| Genre | Where the info is | Amount | Input | Distinguishing move |
 |---|---|---|---|---|
-| Survivor/bullet-heaven | XP bar üst kenar (tam genişlik), timer üst-orta, level kompakt | Run'da az, level-up modalinde yoğun | tek joystick (auto-fire) | Aksiyonu merkeze al, HUD'u ince üst şeride it; seçimler upgrade kartlarında |
-| Match-3/puzzle | Skor+hamle üstte, hedefler yan ray/üst şerit; board merkez | Az-orta, statik | board'a tap/swipe | Board'ı "masa" gibi çerçevele; diegetic board chrome (yüzen pill yok) |
-| Idle/merge | Para üst bar (büyük sayılar), board merkez, prestige+shop alt sekmeler | Yüksek ama statik | tap; alt tab nav | Sayı readout'larını kahraman-UI yap; tab bar burada meşru |
-| Runner | Skor/mesafe üst-orta, coin köşe | Minimal | swipe/tap, tek el | Neredeyse sıfır HUD; hız çizgileri+ekran FX (meta) |
-| Tower defense | Kaynak üst, dalga/can köşe, build paleti alt/yan dock | Orta-yüksek | tap yerleştir; tray'den sürükle | Build tray = kimlik; jenerik bar değil diegetic "kontrol paneli" |
-| Arcade | Skor üst-orta (büyük), can ikon | Az | yön/tap | Cesur numerik tipografiyi tüm estetik yap |
-| Narrative/IF | Diyalog kutusu alt (veya tam overlay), state sübtil | Çok az | tap ilerle, seçim butonları | HUD = metin çerçevesi; imza öğe diyalog paneli |
+| Survivor/bullet-heaven | XP bar top edge (full width), timer top-center, level compact | Little during a run, dense in the level-up modal | single joystick (auto-fire) | Center the action, push the HUD to a thin top strip; choices live on upgrade cards |
+| Match-3/puzzle | Score+moves on top, objectives on a side rail/top strip; board centered | Low-medium, static | tap/swipe the board | Frame the board like a "table"; diegetic board chrome (no floating pills) |
+| Idle/merge | Currency top bar (big numbers), board centered, prestige+shop bottom tabs | High but static | tap; bottom tab nav | Make the number readouts hero-UI; a tab bar is legitimate here |
+| Runner | Score/distance top-center, coins in a corner | Minimal | swipe/tap, one hand | Almost zero HUD; speed lines + screen FX (meta) |
+| Tower defense | Resources on top, wave/health in a corner, build palette docked bottom/side | Medium-high | tap to place; drag from the tray | The build tray = identity; a diegetic "control panel," not a generic bar |
+| Arcade | Score top-center (big), lives icon | Little | direction/tap | Make bold numeric typography the entire aesthetic |
+| Narrative/IF | Dialogue box at bottom (or a full overlay), state subtle | Very little | tap to advance, choice buttons | HUD = the text frame; the signature element is the dialogue panel |
 
-**Anti-samey:** Ardışık iki oyun **aynı anchor desenini** kullanmasın. Önceki "üst pill + alt tab bar" idiyse, sonraki "ince üst şerit + merkez aksiyon + modal seçim" veya "diegetic in-world readout + alt bar yok" olsun.
-
----
-
-## 3. Tipografi (her oyuna kendi font üçlüsü)
-
-**3 rol — ayrı tut:** **Display/başlık** (karakterli; logo/splash/başlık — markayı taşır) · **UI/gövde** (temiz, netlik önce; menü/diyalog/HUD label) · **Numeric** (yüksek okunur, **tabular/monospace** ki skor/timer rakam değişince zıplamasın).
-
-**Türüne göre ton:** fantasy→ornate/el-çizimi · sci-fi→geometrik modüler sans · yarış/spor→bold condensed · casual/çocuk→yuvarlak · horror→distressed display (UI yine okunur) · retro→pixel/blocky · zarif/romance→yüksek-kontrast serif.
-
-**Kurallar:** bir karakterli display + bir temiz text (iki display eşleştirme yok). Küçük boyutta: büyük x-height, düşük stroke-kontrast, kerning/hinting cihazda doğrula; 50–80 char/satır, %130–150 satır aralığı; medium ağırlık. **Varsayılan/sistem font (Roboto/SF/Arial) başlıkta = #1 düşük-efor tell'i — asla.** Lisans: Google Fonts çoğunlukla **OFL** (ticari+gömme serbest); `.ttf`'i `assets/fonts/`'a koy, OFL metnini yanına, pubspec'te tanımla; hedef dil glyph'lerini (TR: ş/ğ/ı) doğrula + fallback.
-
-**Distinctness:** her oyun **kendi display+UI+numeric üçlüsünü** alır. Aynı font stack'i tekrar = reskin.
+**Anti-samey:** two consecutive games shouldn't use the **same anchor pattern**. If the previous one was "top pill + bottom tab bar," the next should be "thin top strip + center action + modal choice" or "diegetic in-world readout + no bottom bar."
 
 ---
 
-## 4. Per-game görsel kimlik (5 sütun)
+## 3. Typography (a font trio of its own for each game)
 
-1. **Palet:** sıkı/kasıtlı — 1 primary, 1 accent, 2–3 nötr, + semantik (iyi/kötü/uyarı). Her oyun **farklı hue ailesi + doygunluk + açık/koyu taban**.
-2. **Form dili:** birini seç ve uygula (keskin-açısal / yumuşak-yuvarlak / organik-blob / beveled-skeuomorphic). Panel, buton, ikon hepsi aynı dili konuşsun.
-3. **İkonografi:** tutarlı set (line/filled/chunky), form diline uygun. Bir oyunun ikonu diğerine düşmemeli.
-4. **Buton/panel stili:** corner radius, stroke, fill (flat/gradient/glass), depth/shadow, pressed state. En çok tekrar eden (ve en ele veren) kit — bilerek değiştir.
-5. **Hareket kişiliği:** easing eğrileri, geçiş stili, idle/hover mikro-animasyon, juice. Snappy/punchy vs floaty/elegant vs springy/playful. Hareket bir marka sinyalidir.
+**3 roles — keep them separate:** **Display/heading** (characterful; logo/splash/title — carries the brand) · **UI/body** (clean, clarity first; menu/dialogue/HUD labels) · **Numeric** (highly legible, **tabular/monospace** so the score/timer doesn't jump when digits change).
 
-**Marka testi:** oynanışı sustur; sadece bir buton + panel + ikon + sayı göster. Ekip "bu hangi oyun?" diyebilmeli. Diyemiyorsa → reskin, başarısız.
+**Tone by genre:** fantasy→ornate/hand-drawn · sci-fi→geometric modular sans · racing/sports→bold condensed · casual/kids→rounded · horror→distressed display (UI still legible) · retro→pixel/blocky · elegant/romance→high-contrast serif.
+
+**Rules:** one characterful display + one clean text (no pairing of two displays). At small sizes: large x-height, low stroke-contrast, verify kerning/hinting on-device; 50–80 chars/line, 130–150% line spacing; medium weight. **A default/system font (Roboto/SF/Arial) in a heading = the #1 low-effort tell — never.** Licensing: Google Fonts are mostly **OFL** (commercial use + embedding free); put the `.ttf` in `assets/fonts/`, the OFL text alongside it, declare it in pubspec; verify the target-language glyphs (TR: ş/ğ/ı) + fallback.
+
+**Distinctness:** each game gets **its own display+UI+numeric trio.** Reusing the same font stack = a reskin.
 
 ---
 
-## 5. Orientation: portrait vs landscape (oyuna göre seç)
+## 4. Per-game visual identity (5 pillars)
 
-Hepsini portrait yapma — orientation bir distinctness kaldıracıdır ve grip/oynanışı belirler.
+1. **Palette:** tight/intentional — 1 primary, 1 accent, 2–3 neutrals, + semantic (good/bad/warning). Each game gets a **different hue family + saturation + light/dark base**.
+2. **Form language:** pick one and apply it (sharp-angular / soft-rounded / organic-blob / beveled-skeuomorphic). Panels, buttons, and icons should all speak the same language.
+3. **Iconography:** a consistent set (line/filled/chunky), matching the form language. One game's icons shouldn't fall into another's.
+4. **Button/panel style:** corner radius, stroke, fill (flat/gradient/glass), depth/shadow, pressed state. The most-repeated (and most revealing) kit — change it deliberately.
+5. **Motion personality:** easing curves, transition style, idle/hover micro-animation, juice. Snappy/punchy vs floaty/elegant vs springy/playful. Motion is a brand signal.
 
-- **Portrait** = genelde **tek el**, baş parmak; hareket halinde; tap-merkezli/düşük-aktif-alan. Etkileşimli kontrolleri **alt ve kenarlara** koy (üst-orta küçük ele uzak).
-- **Landscape** = genelde **iki el**, iki kenar başparmak (konsol-grip); oturmuş/odaklı; geniş yatay alan, aktif oynanış çok. Oyun ne kadar aktifse landscape o kadar mantıklı.
+**Brand test:** mute the gameplay; show only a button + panel + icon + number. The team should be able to say "which game is this?" If they can't → reskin, failed.
 
-| Tür | Tercih | Neden |
+---
+
+## 5. Orientation: portrait vs landscape (choose per game)
+
+Don't make everything portrait — orientation is a distinctness lever and it determines grip/gameplay.
+
+- **Portrait** = usually **one hand**, thumb; on the go; tap-centric/low active area. Place interactive controls at the **bottom and edges** (top-center is far from a one-handed grip).
+- **Landscape** = usually **two hands**, two-edge thumbs (console grip); seated/focused; wide horizontal area, lots of active play. The more active the game, the more landscape makes sense.
+
+| Genre | Preference | Why |
 |---|---|---|
-| Idle/merge/tycoon | Portrait | tap, tek el, hareket halinde |
-| Match-3/puzzle | Portrait | board portrait'te oturur, tek el |
-| Runner | Portrait veya landscape | lane geometrisine göre |
-| Survivor/bullet-heaven | **Landscape** | arena için geniş aktif alan, iki başparmak |
-| Tower defense | **Landscape** | geniş harita + build tray |
-| Arcade | Mekaniğe göre | grip'e uydur |
-| Narrative/IF | Portrait | okuma + tek el ilerleme |
+| Idle/merge/tycoon | Portrait | tap, one hand, on the go |
+| Match-3/puzzle | Portrait | the board fits in portrait, one hand |
+| Runner | Portrait or landscape | depends on lane geometry |
+| Survivor/bullet-heaven | **Landscape** | wide active area for the arena, two thumbs |
+| Tower defense | **Landscape** | wide map + build tray |
+| Arcade | Depends on the mechanic | match it to the grip |
+| Narrative/IF | Portrait | reading + one-handed advancing |
 
-Orientation **HUD/kontrol düzenini** değiştirir (sadece aspect değil): portrait → kontroller alt/kenar, HUD üst şerit; landscape → iki kenar başparmak, HUD geniş üstte. **Flame/Flutter:** `main()`'de `runApp` öncesi `SystemChrome.setPreferredOrientations(...)` ile oyuna özel kilitle; HUD'u **tek bir orientation için** tasarla (tek HUD iki orientation'a hizmet etmesin); fixed-resolution kamera + viewport kenarına anchor. Genel responsive: `references/responsive-design.md`.
-
----
-
-## 6. Anti-reskin (bespoke-identity) kontrol listesi — her oyundan önce
-
-Reskin/asset-flip görünümü oyuncular tarafından anında "ucuz" damgalanır (ve mağaza keşfine zarar verir). Her yeni oyunda:
-
-- [ ] Birincil **diegesis** seçildi ve **bir öncekinden farklı**
-- [ ] Benzersiz **display** font (sistem değil, son oyunun fontu değil)
-- [ ] Benzersiz **UI/gövde** font, cihazda küçük boyutta okunur
-- [ ] **Numeric** font tabular/monospace; hedef-dil glyph'leri doğrulandı
-- [ ] Ayırt edici palet (1 primary/1 accent/nötr/semantik) — farklı hue/taban
-- [ ] Form dili ilan edildi (açısal/yuvarlak/organik/beveled) ve panel+buton+ikona uygulandı
-- [ ] Buton/panel kiti görsel olarak farklı (radius/fill/depth/pressed)
-- [ ] İkon seti bespoke — başka oyuna düşmez
-- [ ] Hareket kişiliği tanımlı (easing/geçiş/juice) — global default değil
-- [ ] **HUD anchor deseni bir öncekinden farklı**
-- [ ] Orientation türe/grip'e göre seçildi; HUD o orientation için kuruldu
-- [ ] Meta/ekran-efekti feedback'inde erişilebilirlik toggle'ı
-- [ ] **Marka testi geçti:** izole buton+panel+ikon+sayı bu oyuna ait tanınıyor
-- [ ] Çekirdek mekanik bir önceki oyundan farklı (portföy çeşitliliği)
+Orientation changes the **HUD/control layout** (not just the aspect): portrait → controls bottom/edge, HUD a top strip; landscape → two-edge thumbs, HUD wide on top. **Flame/Flutter:** lock it per game with `SystemChrome.setPreferredOrientations(...)` before `runApp` in `main()`; design the HUD **for a single orientation** (one HUD shouldn't serve two orientations); fixed-resolution camera + anchor to the viewport edge. General responsive: `references/responsive-design.md`.
 
 ---
 
-## Kaynaklar
+## 6. Anti-reskin (bespoke-identity) checklist — before every game
+
+A reskin/asset-flip look is instantly branded "cheap" by players (and hurts store discovery). For every new game:
+
+- [ ] Primary **diegesis** chosen and **different from the previous one**
+- [ ] Unique **display** font (not system, not the last game's font)
+- [ ] Unique **UI/body** font, legible at small size on-device
+- [ ] **Numeric** font tabular/monospace; target-language glyphs verified
+- [ ] Distinctive palette (1 primary/1 accent/neutrals/semantic) — different hue/base
+- [ ] Form language declared (angular/rounded/organic/beveled) and applied to panel+button+icon
+- [ ] Button/panel kit visually different (radius/fill/depth/pressed)
+- [ ] Icon set bespoke — doesn't fall into another game
+- [ ] Motion personality defined (easing/transition/juice) — not the global default
+- [ ] **HUD anchor pattern different from the previous one**
+- [ ] Orientation chosen by genre/grip; HUD built for that orientation
+- [ ] Accessibility toggle on meta/screen-effect feedback
+- [ ] **Brand test passed:** an isolated button+panel+icon+number is recognizable as belonging to this game
+- [ ] Core mechanic different from the previous game (portfolio variety)
+
+---
+
+## Sources
 
 - Beyond the HUD — Fagerholt & Lorentzon (2009): https://www.researchgate.net/publication/277202228_Beyond_the_HUD_-_User_Interfaces_for_Increased_Player_Immersion_in_FPS_Games
 - Types of UI: Diegetic/Non-Diegetic/Spatial/Meta: https://medium.com/@lorenzoardeni/types-of-ui-in-gaming-diegetic-non-diegetic-spatial-and-meta-5024ce6362d0

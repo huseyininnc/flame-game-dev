@@ -1,15 +1,15 @@
-# Flame: Girdi ve Hareketler (Input & Gestures)
+# Flame: Input & Gestures
 
-Bu doküman Flame'in güncel girdi API'sini kapsar. **Önemli:** Flame, eski `Tappable` / `HasTappables` ve `Draggable` / `HasDraggables` mixin'lerini kullanımdan kaldırmıştır. Güncel yaklaşım, component üzerine eklenen **`TapCallbacks`** ve **`DragCallbacks`** mixin'leridir; bu mixin'ler game tarafında ayrı bir "has..." mixin gerektirmez.
+This document covers Flame's current input API. **Important:** Flame has deprecated the old `Tappable` / `HasTappables` and `Draggable` / `HasDraggables` mixins. The current approach uses the **`TapCallbacks`** and **`DragCallbacks`** mixins added to a component; these mixins do not require a separate "has..." mixin on the game side.
 
-## 1. Tap Olayları — TapCallbacks
+## 1. Tap Events — TapCallbacks
 
-`TapCallbacks` mixin'i bir component'i tap etkileşimlerine duyarlı yapar. Override edilebilir metotlar:
+The `TapCallbacks` mixin makes a component responsive to tap interactions. Overridable methods:
 
-- `onTapDown(TapDownEvent event)` — ekrana ilk dokunuş
-- `onTapUp(TapUpEvent event)` — tap başarıyla tamamlandığında
-- `onTapCancel(TapCancelEvent event)` — tap başarısız olduğunda (örn. parmak hareket edip drag'e dönerse)
-- `onLongTapDown(TapDownEvent event)` — ~300ms basılı tutunca (varsayılan `TapConfig.longTapDelay`)
+- `onTapDown(TapDownEvent event)` — the first touch on the screen
+- `onTapUp(TapUpEvent event)` — when the tap completes successfully
+- `onTapCancel(TapCancelEvent event)` — when the tap fails (e.g., the finger moves and turns into a drag)
+- `onLongTapDown(TapDownEvent event)` — when held for ~300ms (default `TapConfig.longTapDelay`)
 
 ```dart
 class MyComponent extends PositionComponent with TapCallbacks {
@@ -17,16 +17,16 @@ class MyComponent extends PositionComponent with TapCallbacks {
 
   @override
   void onTapUp(TapUpEvent event) {
-    // tap olayına yanıt
+    // respond to the tap event
   }
 }
 ```
 
-`onTapDown` olayı `localPosition` (component koordinatı) ve `canvasPosition` (canvas koordinatı) sağlar. `event.continuePropagation = true` ile alttaki component'lere iletilebilir.
+The `onTapDown` event provides `localPosition` (component coordinate) and `canvasPosition` (canvas coordinate). With `event.continuePropagation = true`, it can be forwarded to the components beneath.
 
 ### Hit detection
 
-Component'ler tap geçerliliği için `containsLocalPoint()` uygular. `PositionComponent` bunu otomatik sağlar; ham `Component` için elle yazılmalıdır.
+Components implement `containsLocalPoint()` for tap validity. `PositionComponent` provides this automatically; for a raw `Component`, it must be written manually.
 
 ```dart
 class MyComponent extends Component with TapCallbacks {
@@ -54,19 +54,19 @@ class MyComponent extends Component with TapCallbacks {
 }
 ```
 
-Çoklu eşzamanlı dokunuşlar olaylardaki `pointerId` ile bağımsız izlenir.
+Multiple simultaneous touches are tracked independently via the `pointerId` on the events.
 
-## 2. Drag Olayları — DragCallbacks
+## 2. Drag Events — DragCallbacks
 
-`DragCallbacks` mixin'i drag hareketlerini etkinleştirir. Component yine `containsLocalPoint()` uygulamalıdır (`PositionComponent`'te hazır gelir).
+The `DragCallbacks` mixin enables drag gestures. The component must again implement `containsLocalPoint()` (provided out of the box on `PositionComponent`).
 
-Metotlar:
-- `onDragStart(DragStartEvent event)` — drag başlangıcı; en üstteki component'e iletilir
-- `onDragUpdate(DragUpdateEvent event)` — sürükleme boyunca sürekli tetiklenir
-- `onDragEnd(DragEndEvent event)` — parmak kaldırılınca (konum verisi yok)
-- `onDragCancel(DragCancelEvent event)` — varsayılan olarak `onDragEnd`'e dönüştürülür
+Methods:
+- `onDragStart(DragStartEvent event)` — start of the drag; forwarded to the topmost component
+- `onDragUpdate(DragUpdateEvent event)` — fired continuously throughout the drag
+- `onDragEnd(DragEndEvent event)` — when the finger is lifted (no position data)
+- `onDragCancel(DragCancelEvent event)` — converted to `onDragEnd` by default
 
-`DragUpdateEvent` şunları sağlar: `localPosition` (component dışına çıkarsa NaN), `delta` / `localDelta` (önceki güncellemeden bu yana hareket), `canvasPosition`, `devicePosition`, `timestamp`.
+`DragUpdateEvent` provides: `localPosition` (NaN if it leaves the component), `delta` / `localDelta` (movement since the previous update), `canvasPosition`, `devicePosition`, `timestamp`.
 
 ```dart
 class MyComponent extends PositionComponent with DragCallbacks {
@@ -74,12 +74,12 @@ class MyComponent extends PositionComponent with DragCallbacks {
 
   @override
   void onDragStart(DragStartEvent event) {
-    // drag olayına yanıt
+    // respond to the drag event
   }
 }
 ```
 
-Bir component'i sürükleyerek hareket ettirme:
+Moving a component by dragging it:
 
 ```dart
 class InteractiveRectangle extends RectangleComponent
@@ -104,15 +104,15 @@ class InteractiveRectangle extends RectangleComponent
 }
 ```
 
-`isDragged` getter'ı aktif sürükleme sırasında `true` döner (görsel geri bildirim için kullanışlıdır). Tek parmak drag olayı, iki parmak hem drag hem scale olayı üretir.
+The `isDragged` getter returns `true` during an active drag (useful for visual feedback). A single-finger drag produces a drag event, while two fingers produce both drag and scale events.
 
-## 3. Klavye Girdisi
+## 3. Keyboard Input
 
-İki yaklaşım vardır: game seviyesinde `KeyboardEvents`, veya component seviyesinde `KeyboardHandler` (`HasKeyboardHandlerComponents` ile birlikte).
+There are two approaches: `KeyboardEvents` at the game level, or `KeyboardHandler` at the component level (together with `HasKeyboardHandlerComponents`).
 
-### Game seviyesi — KeyboardEvents
+### Game level — KeyboardEvents
 
-`onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed)` override edilir ve `KeyEventResult` döner (`handled`, `ignored`, `skipRemainingHandlers`).
+Override `onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed)` and return a `KeyEventResult` (`handled`, `ignored`, `skipRemainingHandlers`).
 
 ```dart
 class MyGame extends FlameGame with KeyboardEvents {
@@ -138,11 +138,11 @@ class MyGame extends FlameGame with KeyboardEvents {
 }
 ```
 
-### Component seviyesi — KeyboardHandler
+### Component level — KeyboardHandler
 
-Component'ler `KeyboardHandler` mixin'i ile klavye olayı alır, ancak yalnızca `HasKeyboardHandlerComponents` ile mixin'lenmiş bir oyuna eklenmelidir. Component'teki `onKeyEvent` aynı imzaya sahiptir ama `bool` döner (`true` propagasyona izin verir, `false` durdurur).
+Components receive keyboard events via the `KeyboardHandler` mixin, but they must be added to a game that is mixed in with `HasKeyboardHandlerComponents`. The component's `onKeyEvent` has the same signature but returns a `bool` (`true` allows propagation, `false` stops it).
 
-> **Çakışma uyarısı:** `HasKeyboardHandlerComponents` kullanılıyorsa, oyunun mixin listesinden `KeyboardEvents` kaldırılmalıdır.
+> **Conflict warning:** If `HasKeyboardHandlerComponents` is used, `KeyboardEvents` must be removed from the game's mixin list.
 
 ```dart
 class MyGame extends FlameGame with HasKeyboardHandlerComponents { }
@@ -150,7 +150,7 @@ class MyGame extends FlameGame with HasKeyboardHandlerComponents { }
 
 ### KeyboardListenerComponent
 
-Component tabanlı kullanım için hazır bileşen. `keyDown` ve `keyUp` map'leri ile `LogicalKeyboardKey` -> callback eşlemesi yapılır.
+A ready-made component for component-based usage. The `keyDown` and `keyUp` maps map `LogicalKeyboardKey` -> callback.
 
 ```dart
 add(
@@ -169,23 +169,23 @@ add(
 );
 ```
 
-> `GameWidget` opsiyonel `focusNode` ve `autofocus` (varsayılan `true`) parametreleri ile klavye odağını kontrol eder.
+> `GameWidget` controls keyboard focus via the optional `focusNode` and `autofocus` (defaults to `true`) parameters.
 
-## 4. Sanal Joystick — JoystickComponent
+## 4. Virtual Joystick — JoystickComponent
 
-Flame, dokunmatik girdi için sanal joystick component'i sağlar.
+Flame provides a virtual joystick component for touch input.
 
-Parametreler:
-- `knob`: sürüklenen kontrol elemanı (genelde `SpriteComponent`)
-- `background`: joystick tabanı
-- `margin`: ekran konumu (`EdgeInsets`)
-- `knobRadius`: opsiyonel knob yarıçapı
+Parameters:
+- `knob`: the dragged control element (usually a `SpriteComponent`)
+- `background`: the joystick base
+- `margin`: screen position (`EdgeInsets`)
+- `knobRadius`: optional knob radius
 
-Durum property'leri:
-- `intensity`: knob'un merkezden kenara çekilme yüzdesi `[0.0, 1.0]`
-- `delta`: knob'un merkezden mutlak çekilme miktarı (`Vector2`)
-- `relativeDelta`: çekilme yüzdesi ve yönü (`Vector2`)
-- `direction`: `JoystickDirection` enum değeri (`JoystickDirection.idle` ile kontrol edilir)
+State properties:
+- `intensity`: the percentage the knob is pulled from center to edge `[0.0, 1.0]`
+- `delta`: the absolute amount the knob is pulled from center (`Vector2`)
+- `relativeDelta`: the percentage and direction of the pull (`Vector2`)
+- `direction`: a `JoystickDirection` enum value (checked against `JoystickDirection.idle`)
 
 ```dart
 final joystick = JoystickComponent(
@@ -201,7 +201,7 @@ final joystick = JoystickComponent(
 );
 ```
 
-Oyuncuyu joystick ile hareket ettirme (`update` döngüsünde):
+Moving the player with the joystick (in the `update` loop):
 
 ```dart
 @override
@@ -216,9 +216,9 @@ void update(double dt) {
 
 ## 5. HudButtonComponent
 
-Mutlak koordinat yerine viewport kenarlarına göre `margin` ile konumlanan buton.
+A button positioned relative to the viewport edges via `margin` rather than absolute coordinates.
 
-Parametreler: `button` (boştayken gösterilen `PositionComponent`), `buttonDown` (basılıyken, opsiyonel), `margin`, `onPressed`, `onReleased`, `respectCamera` (kamera ile hareket için `true`; HUD davranışı için varsayılan `false`).
+Parameters: `button` (the `PositionComponent` shown when idle), `buttonDown` (shown when pressed, optional), `margin`, `onPressed`, `onReleased`, `respectCamera` (`true` to move with the camera; defaults to `false` for HUD behavior).
 
 ```dart
 final button = HudButtonComponent(
@@ -230,9 +230,9 @@ final button = HudButtonComponent(
 add(button);
 ```
 
-Alternatif olarak callback yerine component'i extend edip `onTapDown`, `onTapUp`, `onTapCancel` override edilebilir.
+Alternatively, instead of using callbacks, you can extend the component and override `onTapDown`, `onTapUp`, and `onTapCancel`.
 
-## Kaynaklar
+## Resources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/inputs/tap_events.md
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/inputs/drag_events.md

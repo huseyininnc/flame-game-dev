@@ -1,17 +1,17 @@
-# Flame + flame_bloc: Katmanli Mimari ve Çok-Oyunlu Monorepo
+# Flame + flame_bloc: Layered Architecture and Multi-Game Monorepo
 
-Bu bolum iki konuyu birlestirir:
+This section combines two topics:
 
-1. **flame_bloc** ile oyun mantigini Bloc/Cubit'lerde, render'i ise Flame component'lerinde tutmak (Very Good Ventures katmanli mimarisiyle uyumlu).
-2. Cok sayida kucuk oyunu hizli uretmek icin **paylasilan `game_core` paketi + oyun basina paket** seklinde yeniden kullanilabilir bir monorepo yapisi.
+1. Using **flame_bloc** to keep game logic in Blocs/Cubits and rendering in Flame components (aligned with Very Good Ventures layered architecture).
+2. A reusable monorepo structure in the form of a **shared `game_core` package + a package per game** for rapidly producing many small games.
 
 ---
 
-## 1. flame_bloc — Dogrulanmis API
+## 1. flame_bloc — Verified API
 
-`flame_bloc`, `flutter_bloc`'a benzer sekilde Bloc ve Cubit'leri `FlameGame` icinde kullanmayi saglar. Tum sinif adlari asagida flame_bloc kaynagindan dogrulanmistir.
+`flame_bloc` lets you use Blocs and Cubits inside a `FlameGame`, similar to `flutter_bloc`. All class names below are verified against the flame_bloc source.
 
-### 1.1 Bloc saglama: `FlameBlocProvider`
+### 1.1 Providing a Bloc: `FlameBlocProvider`
 
 ```dart
 class MyGame extends FlameGame {
@@ -30,7 +30,7 @@ class MyGame extends FlameGame {
 }
 ```
 
-Bu provider'in `children'i olan tum component'ler bloc'a erisir. Var olan bir bloc ornegini paylasmak icin `.value` constructor'i kullanilir (örn. Flutter agacindaki bir bloc'u Flame'e tasimak):
+All components that are `children` of this provider can access the bloc. To share an existing bloc instance, use the `.value` constructor (e.g. to carry a bloc from the Flutter tree into Flame):
 
 ```dart
 FlameBlocProvider<ScoreBloc, ScoreState>.value(
@@ -39,7 +39,7 @@ FlameBlocProvider<ScoreBloc, ScoreState>.value(
 );
 ```
 
-### 1.2 Birden cok bloc: `FlameMultiBlocProvider`
+### 1.2 Multiple blocs: `FlameMultiBlocProvider`
 
 ```dart
 class MyGame extends FlameGame {
@@ -65,9 +65,9 @@ class MyGame extends FlameGame {
 }
 ```
 
-### 1.3 State'i dinleme — uc yaklasim
+### 1.3 Listening to state — three approaches
 
-**(a) `FlameBlocListener` component'i** (`listenWhen` filtresi destekler):
+**(a) `FlameBlocListener` component** (supports a `listenWhen` filter):
 
 ```dart
 class Player extends PositionComponent {
@@ -85,7 +85,7 @@ class Player extends PositionComponent {
 }
 ```
 
-**(b) `FlameBlocListenable` mixin'i** — `onNewState`, ayrica opsiyonel `onInitialState` ve `listenWhen` override'lari vardir:
+**(b) `FlameBlocListenable` mixin** — has `onNewState`, plus optional `onInitialState` and `listenWhen` overrides:
 
 ```dart
 class Player extends PositionComponent
@@ -93,7 +93,7 @@ class Player extends PositionComponent
 
   @override
   void onInitialState(PlayerInventoryState state) {
-    // Component mount edildiginde mevcut state ile bir kez cagrilir.
+    // Called once with the current state when the component is mounted.
     updateGear(state);
   }
 
@@ -109,7 +109,7 @@ class Player extends PositionComponent
 }
 ```
 
-**(c) `FlameBlocReader` mixin'i** — sadece bloc'a erisip event gondermek icin (state degisikligi dinlemez). **Tek bir bloc** ile sinirlidir:
+**(c) `FlameBlocReader` mixin** — for accessing the bloc and sending events only (does not listen for state changes). Limited to **a single bloc**:
 
 ```dart
 class Player extends PositionComponent
@@ -121,25 +121,25 @@ class Player extends PositionComponent
 }
 ```
 
-> Sinif adlarini ezberden uretmeyin; dogru adlar: `FlameBlocProvider`, `FlameBlocProvider.value`, `FlameMultiBlocProvider`, `FlameBlocListener` (parametre `onNewState`), `FlameBlocListenable` (mixin, `onNewState`/`onInitialState`/`listenWhen`), `FlameBlocReader` (mixin, `bloc` getter).
+> Do not produce class names from memory; the correct names are: `FlameBlocProvider`, `FlameBlocProvider.value`, `FlameMultiBlocProvider`, `FlameBlocListener` (parameter `onNewState`), `FlameBlocListenable` (mixin, `onNewState`/`onInitialState`/`listenWhen`), `FlameBlocReader` (mixin, `bloc` getter).
 
-### 1.4 Sorumluluk ayrimi (VGV ile hizalama)
+### 1.4 Separation of responsibilities (alignment with VGV)
 
-| Katman | Sorumluluk | flame_bloc rolu |
+| Layer | Responsibility | flame_bloc role |
 |---|---|---|
-| **Repository / Data** | Veri kaynaklari (yuksek skor kalicilik, ayarlar, ses tercihleri) | Bloc tarafindan tuketilir |
-| **Bloc / Cubit** | Oyun *durumu* ve *kurallari* (skor, can, envanter, faz) | `FlameBlocProvider` ile saglanir |
-| **Component (Flame)** | Yalnizca **render** ve girdi -> event | `FlameBlocReader` ile event gonderir, `FlameBlocListenable` ile state'e tepki verir |
+| **Repository / Data** | Data sources (high-score persistence, settings, audio preferences) | Consumed by the Bloc |
+| **Bloc / Cubit** | Game *state* and *rules* (score, health, inventory, phase) | Provided via `FlameBlocProvider` |
+| **Component (Flame)** | **Render** only and input -> event | Sends events via `FlameBlocReader`, reacts to state via `FlameBlocListenable` |
 
-Kural: **Component'ler karar vermez; durumu okur ve cizer.** Hasar, skor, faz gecisi gibi kararlar Bloc'ta verilir. Bu, oyun mantigini widget/test edilebilir tutar ve render'dan ayirir.
+The rule: **Components do not make decisions; they read state and draw.** Decisions such as damage, score, and phase transitions are made in the Bloc. This keeps game logic widget/testable and separated from rendering.
 
 ---
 
-## 2. Çok-Oyunlu Monorepo: Yeniden Kullanim Stratejisi
+## 2. Multi-Game Monorepo: Reuse Strategy
 
-Hedef: Cok sayida kucuk oyunu **paylasilan bir cekirdek** uzerine hizla uretmek. VGV konvansiyonlari (Melos monorepo, Bloc, katmanli mimari, `very_good_analysis`) izlenir.
+The goal: rapidly produce many small games on top of a **shared core**. VGV conventions are followed (Melos monorepo, Bloc, layered architecture, `very_good_analysis`).
 
-### 2.1 Klasor agaci
+### 2.1 Folder tree
 
 ```text
 games_monorepo/
@@ -148,19 +148,19 @@ games_monorepo/
 ├── analysis_options.yaml          # include: package:very_good_analysis/analysis_options.yaml
 │
 ├── packages/
-│   ├── game_core/                 # PAYLASILAN cekirdek (UI/oyun-bagimsiz)
+│   ├── game_core/                 # SHARED core (UI/game-agnostic)
 │   │   ├── lib/
 │   │   │   ├── src/
 │   │   │   │   ├── base/
-│   │   │   │   │   └── base_flame_game.dart      # ortak FlameGame taban sinifi
-│   │   │   │   ├── components/                    # yeniden kullanilabilir component'ler
+│   │   │   │   │   └── base_flame_game.dart      # common FlameGame base class
+│   │   │   │   ├── components/                    # reusable components
 │   │   │   │   │   ├── fade_in_component.dart
 │   │   │   │   │   ├── parallax_background.dart
-│   │   │   │   │   └── pooled/                     # nesne havuzu yardimcilari
+│   │   │   │   │   └── pooled/                     # object pool helpers
 │   │   │   │   ├── services/
-│   │   │   │   │   ├── audio_service.dart          # ses calma soyutlamasi
-│   │   │   │   │   └── asset_manager.dart          # onbellekli asset yukleme
-│   │   │   │   ├── state/                          # ortak Bloc/Cubit'ler
+│   │   │   │   │   ├── audio_service.dart          # audio playback abstraction
+│   │   │   │   │   └── asset_manager.dart          # cached asset loading
+│   │   │   │   ├── state/                          # common Blocs/Cubits
 │   │   │   │   │   ├── score/
 │   │   │   │   │   │   ├── score_bloc.dart
 │   │   │   │   │   │   ├── score_event.dart
@@ -168,13 +168,13 @@ games_monorepo/
 │   │   │   │   │   └── game_phase/
 │   │   │   │   │       └── game_phase_cubit.dart   # menu/playing/paused/gameOver
 │   │   │   │   └── overlays/
-│   │   │   │       ├── pause_menu.dart             # paylasilan Flutter overlay'leri
+│   │   │   │       ├── pause_menu.dart             # shared Flutter overlays
 │   │   │   │       └── game_over_menu.dart
 │   │   │   └── game_core.dart                      # public barrel export
 │   │   ├── pubspec.yaml
 │   │   └── test/
 │   │
-│   ├── scores_repository/         # DATA + REPOSITORY katmani (kalicilik)
+│   ├── scores_repository/         # DATA + REPOSITORY layer (persistence)
 │   │   ├── lib/
 │   │   │   ├── src/
 │   │   │   │   ├── scores_repository.dart
@@ -182,16 +182,16 @@ games_monorepo/
 │   │   │   └── scores_repository.dart
 │   │   └── pubspec.yaml
 │   │
-│   └── game_ui/                   # paylasilan tema/buton/dialog (Flutter)
+│   └── game_ui/                   # shared theme/button/dialog (Flutter)
 │       └── ...
 │
 └── apps/
-    ├── flappy_clone/              # OYUN BASINA paket (feature katmani)
+    ├── flappy_clone/              # PER-GAME package (feature layer)
     │   ├── lib/
     │   │   ├── game/
     │   │   │   ├── flappy_game.dart            # extends BaseFlameGame
-    │   │   │   ├── components/                  # bu oyuna ozel component'ler
-    │   │   │   └── state/                       # bu oyuna ozel Bloc'lar
+    │   │   │   ├── components/                  # components specific to this game
+    │   │   │   └── state/                       # Blocs specific to this game
     │   │   ├── view/
     │   │   │   └── flappy_page.dart             # GameWidget + overlayBuilderMap
     │   │   └── main.dart
@@ -199,23 +199,23 @@ games_monorepo/
     │   └── pubspec.yaml            # depends on: game_core, scores_repository, game_ui
     │
     └── brick_breaker/
-        └── ... (ayni iskelet)
+        └── ... (same skeleton)
 ```
 
-### 2.2 Katman sinirlari (bagimlilik yonu)
+### 2.2 Layer boundaries (dependency direction)
 
 ```text
 apps/<game>  ->  game_core  ->  scores_repository  ->  (data sources)
    (feature)      (engine)        (repository)            (data)
 ```
 
-- **`scores_repository` (data/repository):** Flame'i bilmez. Yuksek skoru kaydeder/okur, domain modelleri doner. Test edilebilir, saf Dart.
-- **`game_core` (engine):** Tum oyunlarin paylastigi tabandir — `BaseFlameGame`, yeniden kullanilabilir component'ler, `AudioService`, `AssetManager`, ortak Bloc'lar (`ScoreBloc`, `GamePhaseCubit`), paylasilan overlay'ler. Belirli bir oyunu bilmez.
-- **`apps/<game>` (feature):** Yalnizca o oyuna ozgu component'ler, Bloc'lar ve `GameWidget` kablolamasi. `game_core` ve `scores_repository`'a bagimlidir.
+- **`scores_repository` (data/repository):** Knows nothing about Flame. Saves/reads the high score, returns domain models. Testable, pure Dart.
+- **`game_core` (engine):** The base shared by all games — `BaseFlameGame`, reusable components, `AudioService`, `AssetManager`, common Blocs (`ScoreBloc`, `GamePhaseCubit`), shared overlays. Knows nothing about a specific game.
+- **`apps/<game>` (feature):** Only the components, Blocs, and `GameWidget` wiring specific to that game. Depends on `game_core` and `scores_repository`.
 
-Bu yon **tek yonludur**: feature -> core -> repository. Core asla bir oyuna geri bagimli olmaz; yeni oyun eklemek mevcut core'u bozmaz (Open/Closed).
+This direction is **one-way**: feature -> core -> repository. The core never depends back on a game; adding a new game does not break the existing core (Open/Closed).
 
-### 2.3 Paylasilan taban oyun sinifi
+### 2.3 Shared base game class
 
 ```dart
 // game_core/lib/src/base/base_flame_game.dart
@@ -233,7 +233,7 @@ abstract class BaseFlameGame extends FlameGame {
 }
 ```
 
-Oyun basina paket bunu genisletir:
+The per-game package extends this:
 
 ```dart
 // apps/flappy_clone/lib/game/flappy_game.dart
@@ -256,9 +256,9 @@ class FlappyGame extends BaseFlameGame {
 }
 ```
 
-### 2.4 Paylasilan servisler (soyutlama uzerinden bagimlilik)
+### 2.4 Shared services (dependency through abstraction)
 
-`AudioService` ve `AssetManager`, somut Flame cagrilarini soyutlayip oyunlara enjekte edilir (Dependency Inversion). Boylece her oyun ayni servisleri tekrar yazmaz ve testte mock'lanabilir.
+`AudioService` and `AssetManager` abstract the concrete Flame calls and are injected into games (Dependency Inversion). This way each game does not rewrite the same services and they can be mocked in tests.
 
 ```dart
 // game_core/lib/src/services/audio_service.dart
@@ -269,18 +269,18 @@ abstract class AudioService {
 }
 ```
 
-### 2.5 VGV konvansiyonlari ozeti
+### 2.5 Summary of VGV conventions
 
-- **Bloc/Cubit** ile durum yonetimi; oyun mantigi component'te degil Bloc'ta.
-- **Katmanli mimari:** data (`*_repository` icindeki kaynaklar) -> repository -> business (Bloc) -> feature (oyun paketi). Her katman yalnizca bir altindakine bagimli.
-- **Paket basina tek sorumluluk:** `scores_repository` sadece kalicilik, `game_core` sadece yeniden kullanilabilir motor.
-- **`very_good_analysis`** kok `analysis_options.yaml`'da en sıkı lint kurali olarak include edilir.
-- **Melos** ile paketler arasi bootstrap/test/format tek komutla.
-- **Yeni oyun = yeni `apps/<game>` paketi**; core kopyalanmaz, bagimlilikla cekilir.
+- State management with **Bloc/Cubit**; game logic in the Bloc, not in the component.
+- **Layered architecture:** data (the sources inside `*_repository`) -> repository -> business (Bloc) -> feature (game package). Each layer depends only on the one beneath it.
+- **Single responsibility per package:** `scores_repository` is only persistence, `game_core` is only the reusable engine.
+- **`very_good_analysis`** is included as the strictest lint rule in the root `analysis_options.yaml`.
+- **Melos** for bootstrap/test/format across packages with a single command.
+- **A new game = a new `apps/<game>` package**; the core is not copied, it is pulled in as a dependency.
 
 ---
 
-## Kaynaklar
+## Sources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/packages/flame_bloc/README.md
 - https://pub.dev/packages/flame_bloc

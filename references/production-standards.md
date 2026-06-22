@@ -1,107 +1,107 @@
-# Studio-Grade Production Standards (ZORUNLU ÇITA)
+# Studio-Grade Production Standards (MANDATORY BAR)
 
-> **Bu skill amatör, kısa, "MVP-as-product", tek-mekanik tech-demo oyunlar ÜRETMEZ.** Üretilen her oyun; 15+ yıllık kıdemli ekiplerin çalıştığı büyük bir stüdyodan çıkmış gibi — **production-ready, içerik-zengin, çok-asset'li, tam sürüm** olmalıdır. Bu doküman çıtayı ve "definition of done"u tanımlar; maddeleri **release blocker** sayılır.
+> **This skill DOES NOT PRODUCE amateur, short, "MVP-as-product", single-mechanic tech-demo games.** Every game produced must feel like it came out of a large studio staffed by senior teams with 15+ years of experience — **production-ready, content-rich, multi-asset, full release.** This document defines the bar and the "definition of done"; its items count as **release blockers.**
 
-**Temel tez:** Profesyonel kalite tek bir büyük şey değildir — amatörün tek tek atladığı **onlarca küçük cila katmanının toplamıdır.** MVP/prototip yalnızca preproduction'da "fun"ı bulmak içindir; **teslim edilen ürün her zaman tam, cilalı, içerik-zengin** olmalı. "Tatsız meyveden iyi su çıkmaz" — cila sağlam çekirdeği büyütür, yerini tutmaz.
+**Core thesis:** Professional quality is not one big thing — it is **the sum of dozens of small polish layers that the amateur skips one by one.** The MVP/prototype exists only to find the "fun" during preproduction; **the delivered product must always be complete, polished, content-rich.** "You can't make good juice from a flavorless fruit" — polish amplifies a solid core, it does not replace it.
 
 ---
 
-## 1. İçerik scope tabanları (launch'ta minimum)
+## 1. Content scope baselines (minimum at launch)
 
-Prototip bir mekaniği 2–5 dk'da kanıtlar. Tam oyun **saatlerce yapılandırılmış ilerleme** sunar — başlangıç/orta/geç oyun. Fark: **doğrulanmış içerik hacmi + onu besleyen sistem treadmill'i.**
+A prototype proves one mechanic in 2–5 min. A full game offers **hours of structured progression** — early/mid/late game. The difference: **validated content volume + the system treadmill that feeds it.**
 
-| Tür | Launch içerik tabanı | Not |
+| Genre | Launch content baseline | Note |
 |---|---|---|
-| **Match-3 / puzzle** | **100–200 elle kurulmuş level** | Candy Crush Soda 150 ile çıktı; 100+ "gerçek" puzzle için inandırıcı minimum |
-| **Hybrid-casual (arena/aksiyon)** | **3–5 ayrı mekanik** + 1 ilerleme omurgası + 1 meta katman; tekrara düşmeden 30–60 dk | Tek mekanik = hypercasual = ince |
-| **Idle / incremental** | **40–60 saat içerik**, **2–4 prestige katmanı**, **30–50 upgrade/node**, skill tree | Her prestige katmanı yeni MEKANİK açsın, sadece büyük sayı değil |
-| **Wave / arena defense** | **3+ biome/tema**, **8–15 düşman/birim tipi**, artan dalga kompozisyonu | Tek düşmanın reskin'i = demo |
+| **Match-3 / puzzle** | **100–200 hand-built levels** | Candy Crush Soda shipped with 150; 100+ is a credible minimum for "real" puzzles |
+| **Hybrid-casual (arena/action)** | **3–5 distinct mechanics** + 1 progression backbone + 1 meta layer; 30–60 min without repetition | Single mechanic = hypercasual = thin |
+| **Idle / incremental** | **40–60 hours of content**, **2–4 prestige layers**, **30–50 upgrades/nodes**, skill tree | Each prestige layer should unlock a new MECHANIC, not just bigger numbers |
+| **Wave / arena defense** | **3+ biomes/themes**, **8–15 enemy/unit types**, escalating wave composition | A reskin of a single enemy = demo |
 
-**Kurallar:**
-- **Başlangıç + orta + GEÇ oyun gönder.** Güçlü D1 + sert D7 düşüşü = "çekirdek loop ötesinde içerik derinliği yok" imzası. Geç-oyun sistemleri (prestige, mastery, endless, koleksiyon) D30 üretir.
-- **Reskin değil, ayrı mekanikler.** Öğrenilecek yeni "şeyler" erken oyun boyunca sürekli gelsin (Royal Match her 1–3 level'da yeni blocker/power-up tanıtır).
-- **Koleksiyon/set** uzun-kuyruk kancası olarak.
-- **Lansman sonrası kadans:** her **1–2 haftada** yeni içerik (industry ritmi); rotasyonlu event arketipleri (competitive / recurring / collectible).
-
----
-
-## 2. Tam sistem yığını (Definition of Done — MVP değil)
-
-MVP çekirdek loop'u kanıtlar. **Tam oyun aşağıdaki destek sistemlerinin HEPSİYLE çıkar.** ★ = launch'ta zorunlu; diğerleri scaffold'u launch'ta olmak kaydıyla fast-follow olabilir.
-
-**Çekirdek:** ★ core loop · ★ level/wave/stage ilerleme omurgası · ★ zorluk eğrisi/dinamik tuning.
-**Meta ilerleme:** ★ player level/XP/mastery · ★ kalıcı upgrade/unlock yolu · prestige/rebirth (idle'da ★) · koleksiyon/album/set.
-**Ekonomi & monetizasyon:** ★ en az **2 para birimi** (soft+hard) · ★ shop/IAP (server doğrulama) · ★ ads mediation (rewarded çekirdek; interstitial oyuncu kancalandıktan SONRA) · battle/season pass · LTO · monetization streak.
-**Engagement/retention:** ★ daily reward/login streak · ★ tutorial/FTUE (en büyük D1 kaldıracı) · events sistemi · achievements · leaderboard/sosyal.
-**Altyapı:** ★ settings (audio/dil/privacy) · ★ save/persistence (+cloud şiddetle önerilir) · ★ analytics + funnel enstrümantasyonu (tutorial adım-adım drop-off zorunlu) · A/B test harness.
-
-**Launch must-have özeti:** core loop + ilerleme omurgası + 2 para birimi + shop/IAP + ads mediation + daily reward + FTUE + settings + save(+cloud) + analytics. Battle pass/events/leaderboard/achievement fast-follow olabilir ama **soketleri launch'ta dursun** (live-ops üzerine inşa edilebilir sistem ister).
-
-**Staggered onboarding (her şeyi birden dökme):** ~**20 level saf eğlence**, sonra ilk live-op/monetizasyon. Monetize etme hakkını kazan. Kalıcı ödül kaynağı eklemek **rebalance gerektirir** (enflasyon); source ve sink'i birlikte tasarla.
+**Rules:**
+- **Ship early + mid + LATE game.** Strong D1 + a sharp D7 drop = the signature of "no content depth beyond the core loop." Late-game systems (prestige, mastery, endless, collection) produce D30.
+- **Distinct mechanics, not reskins.** New "things" to learn should keep arriving throughout the early game (Royal Match introduces a new blocker/power-up every 1–3 levels).
+- **Collection/set** as a long-tail hook.
+- **Post-launch cadence:** new content every **1–2 weeks** (industry rhythm); rotating event archetypes (competitive / recurring / collectible).
 
 ---
 
-## 3. Cila / game-feel çıtası (asıl ayrım)
+## 2. Full system stack (Definition of Done — not MVP)
 
-Amatör ile profesyonel arasındaki *en yüklü* fark. Aşağıdaki katmanları **her etkileşime** uygula (detay: `references/game-design/04-game-feel-and-juice.md`).
+The MVP proves the core loop. **A full game ships with ALL of the support systems below.** ★ = mandatory at launch; the rest may be fast-follow as long as their scaffold is in place at launch.
 
-- **Her şeye easing** (lineer/snap yok): pozisyon, scale, rotasyon, renk, opacity tween'le (Flame `EffectController`+curve). · **Hit-stop / freeze** (~30–80ms) güçlü darbede. · **Screenshake** olaya ölçekli, decay'li (sabit/aşırı değil). · **Knockback + recoil** (iki yönlü). · **Camera lerp + kick.** · **Anticipation + follow-through.** · **Secondary motion** (trail, jiggle, debris). · **Permanence** (kalıcı izler). · **Her aksiyona ses** + **haptics** (mobil). · partikül/VFX olaya ölçekli ve randomize.
+**Core:** ★ core loop · ★ level/wave/stage progression backbone · ★ difficulty curve/dynamic tuning.
+**Meta progression:** ★ player level/XP/mastery · ★ persistent upgrade/unlock path · prestige/rebirth (★ in idle) · collection/album/set.
+**Economy & monetization:** ★ at least **2 currencies** (soft+hard) · ★ shop/IAP (server validation) · ★ ads mediation (rewarded core; interstitial AFTER the player is hooked) · battle/season pass · LTO · monetization streak.
+**Engagement/retention:** ★ daily reward/login streak · ★ tutorial/FTUE (the biggest D1 lever) · events system · achievements · leaderboard/social.
+**Infrastructure:** ★ settings (audio/language/privacy) · ★ save/persistence (+cloud strongly recommended) · ★ analytics + funnel instrumentation (step-by-step tutorial drop-off is mandatory) · A/B test harness.
 
-**Görsel tutarlılık (en büyük amatör tell = tutarsızlık):**
-- **Tek style guide, zorunlu:** kilitli palet, tek ışık yönü, tutarlı oran/PPU, tutarlı ikon dili. · **Placeholder/programmer-art/varsayılan font YOK.** · Karışık stil (asset-store + custom, pixel + smooth-vector) = bozuk okunur. · Her şeyde animasyon (idle, giriş/çıkış, anticipation). · Güçlü silüet + kontrast (okunabilirlik).
+**Launch must-have summary:** core loop + progression backbone + 2 currencies + shop/IAP + ads mediation + daily reward + FTUE + settings + save(+cloud) + analytics. Battle pass/events/leaderboard/achievement can be fast-follow, but **leave their sockets in place at launch** (a system you can build on with live-ops).
 
-**UI/UX cila:** ekranlar arası **animasyonlu geçiş** (hard-cut yok) · tek design system · juicy buton (press/release/ses/haptic/disabled/loading) · tüm durumlar (default/press/disabled/loading/empty/error) · varsayılan/temasız widget yok · dokunma hedefi büyük & thumb-zone.
+**Staggered onboarding (don't dump everything at once):** ~**20 levels of pure fun**, then the first live-op/monetization. Earn the right to monetize. Adding a permanent reward source **requires a rebalance** (inflation); design source and sink together.
 
-**Audio:** her etkileşimde ses · katmanlı + pitch-randomize SFX · adaptive/looping müzik + crossfade · mixing/ducking · Music/SFX ayrı volume + sessiz-mod saygısı.
+---
 
-**"Profesyonel hissi" — ölçülebilir hedefler:**
-- **Input latency:** 60fps'te ≤ **66ms**; asla > **133ms** (aksiyon). İlk feedback < **100ms**.
-- **Kilitli 60 FPS** (yavaş/turn-based değilse), jank/GC-stall yok. Sabit 30 > titreyen 45–60.
+## 3. Polish / game-feel bar (the real differentiator)
+
+The *most loaded* difference between amateur and professional. Apply the layers below to **every interaction** (detail: `references/game-design/04-game-feel-and-juice.md`).
+
+- **Easing on everything** (no linear/snap): tween position, scale, rotation, color, opacity (Flame `EffectController`+curve). · **Hit-stop / freeze** (~30–80ms) on strong impacts. · **Screenshake** scaled to the event, with decay (not fixed/excessive). · **Knockback + recoil** (bidirectional). · **Camera lerp + kick.** · **Anticipation + follow-through.** · **Secondary motion** (trail, jiggle, debris). · **Permanence** (lasting marks). · **Sound on every action** + **haptics** (mobile). · particles/VFX scaled to the event and randomized.
+
+**Visual consistency (the biggest amateur tell = inconsistency):**
+- **One style guide, mandatory:** locked palette, single light direction, consistent ratio/PPU, consistent icon language. · **NO placeholder/programmer-art/default fonts.** · Mixed styles (asset-store + custom, pixel + smooth-vector) = reads as broken. · Animation on everything (idle, enter/exit, anticipation). · Strong silhouette + contrast (readability).
+
+**UI/UX polish:** **animated transitions** between screens (no hard-cut) · one design system · juicy buttons (press/release/sound/haptic/disabled/loading) · all states (default/press/disabled/loading/empty/error) · no default/themeless widgets · large touch targets & thumb-zone.
+
+**Audio:** sound on every interaction · layered + pitch-randomized SFX · adaptive/looping music + crossfade · mixing/ducking · separate Music/SFX volume + respect for silent mode.
+
+**"Professional feel" — measurable targets:**
+- **Input latency:** ≤ **66ms** at 60fps; never > **133ms** (action). First feedback < **100ms**.
+- **Locked 60 FPS** (unless slow/turn-based), no jank/GC-stall. Steady 30 > stuttering 45–60.
 
 ---
 
 ## 4. Launch-readiness checklist (release blocker)
 
-**Stabilite:** crash-free session ≥ **%99.7** (crash ≤ %0.3) · Google Play vitals: user-perceived crash < **%1.09**, ANR < **%0.47** · FTUE/ilk 15 dk yolunda sıfır crash · uzun oturumda memory-leak/OOM yok · crash reporting (symbolicated) çalışıyor.
-**Performans:** kilitli hedef fps mid-tier cihazda tutuyor · cold start birkaç sn, level geçişi mümkünse <1sn (>1sn ise loading göstergesi) · memory bütçesi, büyüme (leak) eğrisi yok · battery/thermal throttling yok · >150MB ise App Bundle.
-**Cihaz kapsamı:** low/mid/high tier, çoklu ekran/aspect/notch/OS · portrait/landscape doğru · Play Pre-launch report temiz.
-**Store assets:** icon 512×512 (≤1024KB) · ≥2 (4+ önerilen) screenshot, ilk 2–3 dönüşüm sürücüsü · feature graphic · preview video 30–120sn · keyword-optimize başlık/açıklama (ASO).
-**Rating/privacy:** içerik/yaş rating · aktif **privacy policy URL** (veri toplanmasa bile) · Data Safety / ATT · IAP açıklama + "restore" test.
-**Erişilebilirlik (sayısal):** dokunma hedefi ≥ **48dp (Android) / 44pt (iOS)** · renk-tek-başına bilgi taşımaz (şekil/ikon/desen) · metin ölçeklenir (OS dynamic type) · **reduce-motion** seçeneği, flashing yok · caption/subtitle (özelleştirilebilir) · SFX/Music/speech ayrı ses · TalkBack/VoiceOver menüde doğrulandı.
-**Lokalizasyon:** tüm string externalize (Flutter ARB) · UTF-8 + locale formatlama · metin genişlemesi toleransı (+%30–40 DE) · RTL (Arapça/İbranice, `Directionality`) · font kapsamı (tofu yok) · pseudo-localization pass.
-**QA & telemetri:** alpha=feature-freeze → beta=content-freeze · regression (fps/memory/load sayısal) her build · soft-launch (sınırlı geo) ile D1/D7/D30 + funnel okunur · event taksonomisi (progression/economy/business/error) + FTUE funnel + app-version tag · A/B harness (remote config).
-**Live-ops:** remote config (balance/pricing/FTUE/flag client güncellemesiz) · data-driven content pipeline · event kadansı (ekibe göre; 72 saat Cuma–Pazar altın pencere) · rollback/kill-switch + staged rollout.
+**Stability:** crash-free session ≥ **99.7%** (crash ≤ 0.3%) · Google Play vitals: user-perceived crash < **1.09%**, ANR < **0.47%** · zero crashes on the FTUE/first 15 min path · no memory-leak/OOM in long sessions · crash reporting (symbolicated) working.
+**Performance:** locked target fps holds on a mid-tier device · cold start a few sec, level transition <1s where possible (loading indicator if >1s) · memory budget, no growth (leak) curve · no battery/thermal throttling · App Bundle if >150MB.
+**Device coverage:** low/mid/high tier, multiple screens/aspects/notch/OS · portrait/landscape correct · Play Pre-launch report clean.
+**Store assets:** icon 512×512 (≤1024KB) · ≥2 (4+ recommended) screenshots, first 2–3 as conversion drivers · feature graphic · preview video 30–120s · keyword-optimized title/description (ASO).
+**Rating/privacy:** content/age rating · active **privacy policy URL** (even if no data is collected) · Data Safety / ATT · IAP disclosure + "restore" tested.
+**Accessibility (numeric):** touch target ≥ **48dp (Android) / 44pt (iOS)** · color alone does not carry information (shape/icon/pattern) · text scales (OS dynamic type) · **reduce-motion** option, no flashing · captions/subtitles (customizable) · separate SFX/Music/speech volume · TalkBack/VoiceOver verified in menus.
+**Localization:** all strings externalized (Flutter ARB) · UTF-8 + locale formatting · text-expansion tolerance (+30–40% DE) · RTL (Arabic/Hebrew, `Directionality`) · font coverage (no tofu) · pseudo-localization pass.
+**QA & telemetry:** alpha=feature-freeze → beta=content-freeze · regression (fps/memory/load numeric) on every build · soft-launch (limited geo) to read D1/D7/D30 + funnel · event taxonomy (progression/economy/business/error) + FTUE funnel + app-version tag · A/B harness (remote config).
+**Live-ops:** remote config (balance/pricing/FTUE/flag without a client update) · data-driven content pipeline · event cadence (per the team; 72-hour Fri–Sun is the golden window) · rollback/kill-switch + staged rollout.
 
 ---
 
-## 5. Scope disiplini: hırslı AMA bitirilebilir
+## 5. Scope discipline: ambitious BUT finishable
 
-Hacmi boğulmadan üretmenin yolu **el-işçiliği değil, sistemler**:
-- **Data-driven content:** level/wave/düşman/upgrade'i **config (veri)** olarak tanımla, kod değil. Motoru bir kez kur; içeriği sonsuza dek veri olarak dök. (Bkz. `references/game-design/08-level-design-for-2d-casual.md`.)
-- **Parametrik/şablon içerik:** level config'lerini parametrik modelden üret ("level design as a service").
-- **Yeniden kullanılan sistemler:** tek event framework (competitive+recurring+collectible), tek currency, tek shop, tek reward dispenser — parametreli.
-- **Modüler içerik:** biome = palet-swap + yeni data; yeni düşman = data satırı + sprite, yeni kod yolu değil.
-- **KPI hedefi koy** (retention/funnel), data-inspired drift'ten kaçın.
-- **Polish bütçesini koru:** sabit faz olarak planla (≥ ~2 ay eşdeğeri emek); içerik üretimi onu yemesin.
+The way to produce volume without drowning is **systems, not handcraft**:
+- **Data-driven content:** define level/wave/enemy/upgrade as **config (data)**, not code. Build the engine once; pour content out as data forever. (See `references/game-design/08-level-design-for-2d-casual.md`.)
+- **Parametric/template content:** generate level configs from a parametric model ("level design as a service").
+- **Reused systems:** one event framework (competitive+recurring+collectible), one currency, one shop, one reward dispenser — parameterized.
+- **Modular content:** biome = palette-swap + new data; new enemy = a data row + sprite, not a new code path.
+- **Set a KPI target** (retention/funnel), avoid data-inspired drift.
+- **Protect the polish budget:** plan it as a fixed phase (≥ ~2 months equivalent effort); don't let content production eat it.
 
-**Üretim sırası:** vertical slice (near-final kalite, prototip değil) → content production (alpha=tüm özellik var) → **korunmuş polish** → soft launch (D1/D7/D30 oku, iterate) → launch (RC → gold).
+**Production order:** vertical slice (near-final quality, not a prototype) → content production (alpha=all features present) → **protected polish** → soft launch (read D1/D7/D30, iterate) → launch (RC → gold).
 
-**Tek-satır scope formülü:** Yeniden-kullanılır, data-driven sistemleri vertical-slice kalitesine getir; sonra modüler içeriği veri olarak launch hacmine dök (ör. 100–200 puzzle level / 3–5 mekanik / 40–60 idle saat / 8–15 düşman+3 biome); must-have sistem yığınıyla sar; meta/monetizasyonu stagger'la (~20 level önce eğlence); 1–2 hafta kadansla besle.
-
----
-
-## 6. Amatör tell'leri (KESİNLİKLE kaçın)
-
-- Varsayılan font/arka plan · karışık/uyumsuz sanat · shipped build'de placeholder/programmer-art · tutarsız ışık/palet · snap'leyen statik sprite · düşük kontrast/zayıf silüet.
-- Lineer/snap hareket (easing yok) · ağırlıksız darbe (hit-stop/knockback/shake yok) · rigid 1:1 kamera · iz bırakmayan dünya · ya hiç juice ya aşırı shake.
-- Hard-cut ekran geçişi · temasız/varsayılan widget · statik/sessiz buton · boş/donmuş loading/dead-end error · küçük dokunma hedefi.
-- Sessiz etkileşim · tek tekrar eden klip · hard-restart müzik · ses ayarı yok · düz/clipping mix.
-- Ölçülmemiş/>133ms latency · titreyen fps/jank · feedback yok · metin-duvarı/yok onboarding · ölü mikro-etkileşim.
-- **Tek mekanik + birkaç ekran "tam oyun" diye gönderilmiş** (demo smell) · sadece "başlangıç" oyun, orta/geç yok · içerik çeşitliliği yok.
+**One-line scope formula:** Bring reusable, data-driven systems to vertical-slice quality; then pour modular content as data up to launch volume (e.g. 100–200 puzzle levels / 3–5 mechanics / 40–60 idle hours / 8–15 enemies+3 biomes); wrap it with the must-have system stack; stagger meta/monetization (~20 levels of fun first); feed it on a 1–2 week cadence.
 
 ---
 
-## Kaynaklar
+## 6. Amateur tells (ABSOLUTELY avoid)
+
+- Default font/background · mixed/mismatched art · placeholder/programmer-art in a shipped build · inconsistent light/palette · snapping static sprites · low contrast/weak silhouette.
+- Linear/snap movement (no easing) · weightless impact (no hit-stop/knockback/shake) · rigid 1:1 camera · a world that leaves no marks · either no juice at all or excessive shake.
+- Hard-cut screen transition · themeless/default widgets · static/silent buttons · empty/frozen loading/dead-end error · small touch targets.
+- Silent interaction · a single repeating clip · hard-restart music · no audio setting · flat/clipping mix.
+- Unmeasured/>133ms latency · stuttering fps/jank · no feedback · wall-of-text/no onboarding · dead micro-interactions.
+- **A single mechanic + a few screens shipped as a "full game"** (demo smell) · only "early" game, no mid/late · no content variety.
+
+---
+
+## Resources
 
 - The Art of Screenshake — Vlambeer (Jan Willem Nijman): https://www.youtube.com/watch?v=AJdEqssNZ-U
 - Juice It or Lose It — Jonasson & Purho: https://www.youtube.com/watch?v=Fy0aCDmgnxg

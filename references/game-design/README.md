@@ -1,27 +1,27 @@
-# Oyun Tasarımı & Level Design — Bilgi Tabanı (Knowledge Base)
+# Game Design & Level Design — Knowledge Base
 
-Bu klasör, **profesyonel oyun geliştirme süreçleri** ve **level design** için derlenmiş referans dokümanlarını içerir. İçerik; GDC konuşmaları, Game Maker's Toolkit, The Level Design Book, Nintendo/Valve tasarım felsefesi, Jesse Schell (*The Art of Game Design*), Steve Swink (*Game Feel*), MDA makalesi (Hunicke/LeBlanc/Zubek), Daniel Cook, ve casual/mobil sektör kaynaklarından (Game Developer/Gamasutra, Socialpoint, Mobile Free To Play vb.) derinlemesine internet araştırmasıyla doğrulanmıştır.
+This folder contains reference documents compiled for **professional game development processes** and **level design**. The content has been verified through in-depth internet research from GDC talks, Game Maker's Toolkit, The Level Design Book, Nintendo/Valve design philosophy, Jesse Schell (*The Art of Game Design*), Steve Swink (*Game Feel*), the MDA paper (Hunicke/LeBlanc/Zubek), Daniel Cook, and casual/mobile industry sources (Game Developer/Gamasutra, Socialpoint, Mobile Free To Play, etc.).
 
-> Bu KB **tasarım** bilgisidir (ne ve neden). Motor/teknik (nasıl, Flame API) için kardeş KB: `references/flame/`.
-> `flame-game-dev` skill'i bu iki KB'yi de üretim kuralı olarak referanslar.
+> This KB is **design** knowledge (what and why). For engine/technical knowledge (how, the Flame API), see the sibling KB: `references/flame/`.
+> The `flame-game-dev` skill references both of these KBs as production rules.
 
-## İçindekiler
+## Contents
 
-| # | Dosya | Konu |
+| # | File | Topic |
 |---|---|---|
-| 01 | [01-design-foundations.md](01-design-foundations.md) | MDA, 8 estetik, core/meta/session loop, design pillars, juice (giriş) |
-| 02 | [02-level-design-principles.md](02-level-design-principles.md) | **Level design çekirdeği:** introduce/develop/twist/conclude, Kishōtenketsu, teach-then-test, signposting/affordance, gating/locks&keys, level-içi pacing, blockout süreci, sık hatalar |
-| 03 | [03-difficulty-and-pacing.md](03-difficulty-and-pacing.md) | Flow channel, sawtooth/fractal eğri, difficulty spike, interest curve, intensity ramp, DDA, balancing |
-| 04 | [04-game-feel-and-juice.md](04-game-feel-and-juice.md) | Swink 3 sütun, juice checklist (screenshake, hit-stop, squash&stretch, easing, ses) |
+| 01 | [01-design-foundations.md](01-design-foundations.md) | MDA, the 8 aesthetics, core/meta/session loop, design pillars, juice (intro) |
+| 02 | [02-level-design-principles.md](02-level-design-principles.md) | **Level design core:** introduce/develop/twist/conclude, Kishōtenketsu, teach-then-test, signposting/affordance, gating/locks&keys, in-level pacing, blockout process, common mistakes |
+| 03 | [03-difficulty-and-pacing.md](03-difficulty-and-pacing.md) | Flow channel, sawtooth/fractal curve, difficulty spike, interest curve, intensity ramp, DDA, balancing |
+| 04 | [04-game-feel-and-juice.md](04-game-feel-and-juice.md) | Swink's 3 pillars, juice checklist (screenshake, hit-stop, squash&stretch, easing, sound) |
 | 05 | [05-onboarding-and-tutorialization.md](05-onboarding-and-tutorialization.md) | FTUE, show-don't-tell, skill atom, progressive disclosure, time-to-fun |
-| 06 | [06-progression-economy-retention.md](06-progression-economy-retention.md) | Core/meta loop tür şablonları, progression, reward schedule, ekonomi (soft/hard, source/sink, idle), D1/D7/D30, etik |
-| 07 | [07-professional-process.md](07-professional-process.md) | Yaşam döngüsü, prototip vs vertical slice, milestone'lar (alpha/beta freeze), lean GDD, playtest/iterasyon, scoping (MVP/MoSCoW) |
-| 08 | [08-level-design-for-2d-casual.md](08-level-design-for-2d-casual.md) | **2D/puzzle/casual/idle uygulaması:** levels-as-data (JSON/Tiled, LevelConfig), sawtooth şablonu, match-3 tuning, telemetri, Flame eşlemesi |
-| 09 | [09-art-ui-identity-and-orientation.md](09-art-ui-identity-and-orientation.md) | **Per-game kimlik (ZORUNLU):** HUD diegesis, türe-göre HUD düzeni, tipografi (3 rol/font üçlüsü), görsel kimlik 5 sütun, orientation (portrait/landscape) seçimi, anti-reskin checklist |
+| 06 | [06-progression-economy-retention.md](06-progression-economy-retention.md) | Core/meta loop genre templates, progression, reward schedule, economy (soft/hard, source/sink, idle), D1/D7/D30, ethics |
+| 07 | [07-professional-process.md](07-professional-process.md) | Lifecycle, prototype vs vertical slice, milestones (alpha/beta freeze), lean GDD, playtest/iteration, scoping (MVP/MoSCoW) |
+| 08 | [08-level-design-for-2d-casual.md](08-level-design-for-2d-casual.md) | **2D/puzzle/casual/idle application:** levels-as-data (JSON/Tiled, LevelConfig), sawtooth template, match-3 tuning, telemetry, Flame mapping |
+| 09 | [09-art-ui-identity-and-orientation.md](09-art-ui-identity-and-orientation.md) | **Per-game identity (MANDATORY):** HUD diegesis, genre-based HUD layout, typography (3 roles/font trio), 5 pillars of visual identity, orientation (portrait/landscape) choice, anti-reskin checklist |
 
-## Nasıl kullanılır
+## How to use
 
-- **Yeni oyundan önce (game-greenlight ile birlikte):** 01 (pillar/estetik/loop) + 07 (scope/prototip).
-- **Level/wave/zorluk tasarlarken:** 02 + 03 + 08 (en kritik üçlü).
-- **Cila ve tutundurma:** 04 (juice) + 05 (onboarding) + 06 (progression/retention).
-- Bu KB ayrıca `flame-game-dev` Claude Code skill'i ile kullanılır; skill bu dokümanları üretim kuralları olarak referanslar.
+- **Before a new game (together with game-greenlight):** 01 (pillar/aesthetic/loop) + 07 (scope/prototype).
+- **When designing levels/waves/difficulty:** 02 + 03 + 08 (the most critical trio).
+- **Polish and retention:** 04 (juice) + 05 (onboarding) + 06 (progression/retention).
+- This KB is also used together with the `flame-game-dev` Claude Code skill; the skill references these documents as production rules.

@@ -1,77 +1,77 @@
-# Profesyonel Oyun Geliştirme Süreci
+# Professional Game Development Process
 
-Konseptten yayına ve live-ops'a uzanan iş akışı; prototip/vertical slice, milestone'lar, GDD, iterasyon/playtest ve scoping.
-
----
-
-## 1. Geliştirme yaşam döngüsü
-
-**Kural:** bir tasarım kararını değiştirme maliyeti, bu fazlarda sağa gittikçe kat kat artar. **Orantısız çoğu emeği preproduction'a harca.**
-
-- **Concept / Ideation:** tür, kitle, tema, kanca, çekirdek fantezi; fizibilite/kârlılık kontrolü. Çıktı: kısa pitch + hedef estetikler (MDA, bkz. 01).
-- **Preproduction (en önemli faz):** *ne inşa edileceğini, maliyetini ve eğlenceli olup olmadığını* — yani **"find the fun"** — pahalı üretimden ÖNCE çöz. Riski ucuza öldür. Aktivite: prototip, core-loop, motor/teknoloji seçimi, art-direction testi, tek-sayfa GDD, ideal olarak **vertical slice**. Çıkış: oyunun inşaya değer olduğunu ve kabaca maliyetini bilirsin; "eğlenceli mi?" sorusu açık kalmamalı.
-- **Production:** blueprint ölçekte içeriğe dönüşür (tüm sistem/level/art/audio). Maliyet ve kafa-sayısının çoğu burada. Playtest sürekli.
-- **Post-production:** Alpha → Beta → Release stabilizasyon (bug fix, balance, optimize, certification).
-- **Live-Ops / bakım (casual/mobil için şart):** lansman sonrası sürekli içerik + event (yeni level paketi, sezon, turnuva, indirim). Doğası gereği **agile, döngüsel**. Match-3/casual'da **ayda ~40–80 yeni level**, haftalık/iki-haftalık kadansla beklenir (bkz. 08).
+The workflow from concept to launch and live-ops; prototype/vertical slice, milestones, GDD, iteration/playtest, and scoping.
 
 ---
 
-## 2. Prototip & Vertical slice
+## 1. Development life cycle
 
-- **Paper prototype:** en ucuz test; kart/token/grid ile **mekaniği** test et (grafik değil). Hızlı başarısız ol, zayıf fikri at.
-- **Greybox/blockout:** sıfır yeni sanatla **oynanabilir**; tek mekaniği izole et. (Bkz. 02 §5.)
-- **"Find the fun" prototype:** atılabilir dijital build; tek işi core loop'un eğlenceli olduğunu, değiştirmek hâlâ ucuzken doğrulamak. Bulamazsan üretime **geçme**.
-- **Vertical slice:** küçük ama **final-kalite** dilim (art+gameplay+sistem+UI+audio birlikte, ship kalitesinde) = "tek-level ama gerçek". Neden: preprod→prod **geçiş kapısı**; pipeline'ı ve kalite çıtasını kanıtlar; publisher/yönetim pitch artefaktı. Kapsamı **küçük** tut (pahalıdır).
-- **Ayrım:** prototip = *"eğlenceli mi?"* (çirkin, atılabilir). Vertical slice = *"bu kaliteyi ölçekte üretebilir miyiz, finanse edilmeli mi?"* (temsilî, cilalı).
+**Rule:** the cost of changing a design decision multiplies the further right you move through these phases. **Spend a disproportionate share of the effort on preproduction.**
+
+- **Concept / Ideation:** genre, audience, theme, hook, core fantasy; feasibility/profitability check. Output: a short pitch + target aesthetics (MDA, see 01).
+- **Preproduction (the most important phase):** figure out *what will be built, what it will cost, and whether it is fun* — i.e. **"find the fun"** — BEFORE expensive production. Kill risk cheaply. Activities: prototype, core-loop, engine/technology selection, art-direction testing, a one-page GDD, and ideally a **vertical slice**. Exit: you know the game is worth building and roughly what it will cost; the question "is it fun?" must not remain open.
+- **Production:** the blueprint turns into content at scale (all systems/levels/art/audio). Most of the cost and headcount sits here. Playtesting is continuous.
+- **Post-production:** Alpha → Beta → Release stabilization (bug fixing, balancing, optimization, certification).
+- **Live-Ops / maintenance (a must for casual/mobile):** continuous post-launch content + events (new level packs, seasons, tournaments, discounts). By nature **agile and cyclical**. In match-3/casual, **~40–80 new levels per month** is expected, at a weekly/biweekly cadence (see 08).
 
 ---
 
-## 3. Milestone'lar (tanım & çıkış kriteri)
+## 2. Prototype & vertical slice
 
-| Milestone | Tanım | Çıkış kriteri |
+- **Paper prototype:** the cheapest test; test the **mechanic** with cards/tokens/grids (not graphics). Fail fast, discard the weak idea.
+- **Greybox/blockout:** **playable** with zero new art; isolate a single mechanic. (See 02 §5.)
+- **"Find the fun" prototype:** a throwaway digital build; its only job is to verify that the core loop is fun while changing it is still cheap. If you can't find it, **do not** proceed to production.
+- **Vertical slice:** a small but **final-quality** slice (art+gameplay+systems+UI+audio together, at ship quality) = "one level, but real." Why: the preprod→prod **gating decision**; it proves the pipeline and the quality bar; it's a publisher/management pitch artifact. Keep its scope **small** (it's expensive).
+- **Distinction:** prototype = *"is it fun?"* (ugly, throwaway). Vertical slice = *"can we produce this quality at scale, should it be funded?"* (representative, polished).
+
+---
+
+## 3. Milestones (definition & exit criteria)
+
+| Milestone | Definition | Exit criteria |
 |---|---|---|
-| **Prototype** | Çekirdek mekanik izole, atılabilir kod/art | Core loop kanıtlanmış şekilde eğlenceli |
-| **First Playable** | Temsilî oynanış + placeholder, baştan sona oynanır | Ana oynanış öğeleri çalışıyor, okunur |
-| **Vertical Slice** | Final-kalite temsilî bölüm | Kalite çıtası + pipeline kanıtlı; greenlight kararı |
-| **Alpha (Feature Complete)** | Tüm özellikler var; baştan sona oynanır; asset placeholder olabilir | **Feature freeze** — sonrasında yeni özellik yok |
-| **Beta (Content Complete)** | Tüm özellik + final asset; sadece bug-fix/balance | **Content freeze**; ship-blocker yok |
-| **Release Candidate / Gold** | Final build, certification geçti | Sıfır bilinen blocker; cert geçer; onaylı |
+| **Prototype** | Core mechanic isolated, throwaway code/art | Core loop demonstrably fun |
+| **First Playable** | Representative gameplay + placeholders, playable start to finish | Main gameplay elements working, readable |
+| **Vertical Slice** | Final-quality representative section | Quality bar + pipeline proven; greenlight decision |
+| **Alpha (Feature Complete)** | All features present; playable start to finish; assets may be placeholder | **Feature freeze** — no new features afterward |
+| **Beta (Content Complete)** | All features + final assets; bug-fix/balance only | **Content freeze**; no ship-blockers |
+| **Release Candidate / Gold** | Final build, passed certification | Zero known blockers; passes cert; approved |
 
-**Pratik kural:** *feature freeze (alpha)* ve *content freeze (beta)* sert kapılardır. En sık üretim hatası: alpha'dan sonra özellik eklemek (stabilizasyon saatini sıfırlar).
-
----
-
-## 4. GDD — modern, hafif yaklaşım
-
-Lean, **yaşayan** iletişim aracı; 100-sayfalık veritabanı değil.
-
-- **Tek sayfayla başla** (Stone Librande disiplini): başlık + tagline, tek-paragraf elevator pitch, **design pillars**, kitle/platform, core loop, ana mekanikler, ikincil sistemler, progression, art/audio yönü, kaba roadmap. **Görsel** (harita/akış şeması) > yoğun metin. Okuyan çekirdeği ~30 saniyede kavramalı.
-- **Pillars:** 3–5 kısa öbek (MDA estetiklerine eşlenir); her karar bunlara karşı sınanır. **Non-goals** da yaz.
-- **Katman katman büyüt:** 1 sayfa → ~10 sayfa → tam doküman; baştan tam doküman yazma.
-- **Kaçın:** test edilmemiş mekaniği prototipten önce aşırı-spesifikleştirme; büyük/erken eskiyen doküman; sistem ilişkilerini dağınık wiki sayfalarına gömme.
+**Practical rule:** *feature freeze (alpha)* and *content freeze (beta)* are hard gates. The most common production mistake: adding features after alpha (it resets the stabilization clock).
 
 ---
 
-## 5. İterasyon & playtest
+## 4. GDD — the modern, lightweight approach
 
-**Döngü:** hipotez → en küçük test edilebilir sürümü kur → playtest/gözle → ölç → kes/ayarla → tekrar. **Tasarımlar hipotezdir; playtest deneydir (Valve).**
+A lean, **living** communication tool; not a 100-page database.
 
-- **Türler:** internal (oynanır olur olmaz devler) · external/taze oyuncu (şart; dev kendi oyununa kördür) · **Kleenex testing** (her test oyuncusunu **bir kez** kullan — ilk-izlenim/onboarding bir kez yaşanır) · usability ("kullanabiliyor mu?") vs experience ("hedef estetik çıkıyor mu?").
-- **Ne gözlemlenir:** söylediği değil **yaptığı** — kafa karışıklığı, tereddüt, takılma/çıkma, bölüm başına süre, fail sıklığı. Protokol: gözlem → kısa anket → kısa Q&A. Biyometri gerekmez. Valve level tasarımcıları **her hafta** playtest yapar.
-- **Telemetri:** fail noktaları, level başına deneme, drop-off, oturum süresi, churn'ü logla; soft-launch sonrası retune et ve **level sırasını değiştir** (bkz. 08).
-
----
-
-## 6. Scoping & kesme (MVP)
-
-- **MVP** = sadece çekirdek özellikler, en hızlı şekilde test oyuncusuna.
-- **Kill your darlings:** vizyona hizmet etmeyen sevgili özellikleri atmaya razı ol. "Yapabiliyor olman yapmalısın demek değil — şişkinlik oyunu öldürür."
-- **MoSCoW:** Must / Should / Could / Won't. "Must"ı kilitle; gerisi kesilebilir.
-- Scope creep solo/indie'nin varsayılan başarısızlık modudur — pillar'lara ve MVP tanımına karşı aktif yönet.
+- **Start with one page** (the Stone Librande discipline): title + tagline, a one-paragraph elevator pitch, **design pillars**, audience/platform, core loop, main mechanics, secondary systems, progression, art/audio direction, a rough roadmap. **Visuals** (map/flowchart) > dense text. A reader should grasp the core in ~30 seconds.
+- **Pillars:** 3–5 short phrases (mapped to MDA aesthetics); every decision is tested against them. Write down the **non-goals** too.
+- **Grow it layer by layer:** 1 page → ~10 pages → full document; don't write the full document up front.
+- **Avoid:** over-specifying an untested mechanic before prototyping; a large document that goes stale early; burying system relationships across scattered wiki pages.
 
 ---
 
-## Kaynaklar
+## 5. Iteration & playtest
+
+**The loop:** hypothesis → build the smallest testable version → playtest/observe → measure → cut/adjust → repeat. **Designs are hypotheses; the playtest is the experiment (Valve).**
+
+- **Types:** internal (devs, as soon as it's playable) · external/fresh players (a must; the dev is blind to their own game) · **Kleenex testing** (use each test player **once** — first-impression/onboarding happens once) · usability ("can they use it?") vs experience ("is the target aesthetic coming through?").
+- **What to observe:** what they **do**, not what they say — confusion, hesitation, getting stuck/quitting, time per section, failure frequency. Protocol: observe → short survey → short Q&A. Biometrics aren't needed. Valve's level designers playtest **every week**.
+- **Telemetry:** log failure points, attempts per level, drop-off, session length, churn; retune after soft-launch and **reorder the levels** (see 08).
+
+---
+
+## 6. Scoping & cutting (MVP)
+
+- **MVP** = only the core features, to a test player as fast as possible.
+- **Kill your darlings:** be willing to cut beloved features that don't serve the vision. "Being able to do something doesn't mean you should — bloat kills the game."
+- **MoSCoW:** Must / Should / Could / Won't. Lock the "Must"; the rest is cuttable.
+- Scope creep is the default failure mode of solo/indie — actively manage it against the pillars and the MVP definition.
+
+---
+
+## Sources
 
 - What Is the Game Development Life Cycle? — Game Developer: https://www.gamedeveloper.com/business/what-is-the-game-development-life-cycle-
 - What you should take out of Pre-Production — Game Developer: https://gamedeveloper.com/blogs/what-you-should-take-out-of-pre-production

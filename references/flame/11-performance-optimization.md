@@ -1,12 +1,12 @@
-# Flame: 60 FPS Performans Optimizasyonu
+# Flame: 60 FPS Performance Optimization
 
-Cok sayida kucuk oyunu uretirken her birinin akici (hedef **60 FPS**) calismasi icin tekrarlanabilir performans kurallari. Asagidaki API'ler Flame kaynagindan dogrulanmistir.
+Repeatable performance rules so that, when producing many small games, each one runs smoothly (target **60 FPS**). The APIs below are verified against the Flame source.
 
 ---
 
-## 1. Asset'leri `onLoad` icinde onceden yukleyin
+## 1. Preload assets inside `onLoad`
 
-Oyun calisirken (`update`/`render` sirasinda) gorsel/ses yuklemek frame dususune yol acar. Tum image ve audio'yu `onLoad` icinde, oyun baslamadan once preload edin.
+Loading images/audio while the game is running (during `update`/`render`) causes frame drops. Preload all images and audio inside `onLoad`, before the game starts.
 
 ```dart
 class MyGame extends FlameGame {
@@ -27,37 +27,37 @@ class MyGame extends FlameGame {
 }
 ```
 
-Boylece runtime sirasinda disk/cozme gecikmesi olmaz; tum kareler hazir bellekteki kaynaklari kullanir.
+This way there is no disk/decode latency at runtime; every frame uses resources already in memory.
 
 ---
 
-## 2. `update()` icinde tahsisattan (allocation) kacinin
+## 2. Avoid allocation inside `update()`
 
-`update(double dt)` saniyede ~60 kez calisir. Her karede yeni nesne (`Vector2`, liste, closure) yaratmak garbage collector'i tetikler ve jank olusturur. Nesneleri **bir kez** olusturup yeniden kullanin.
+`update(double dt)` runs ~60 times per second. Creating a new object (`Vector2`, list, closure) every frame triggers the garbage collector and causes jank. Create objects **once** and reuse them.
 
 ```dart
 class Player extends PositionComponent {
-  // Her karede yeniden yaratmak yerine bir kez tahsis et.
+  // Allocate once instead of recreating every frame.
   final Vector2 _velocity = Vector2.zero();
 
   @override
   void update(double dt) {
     super.update(dt);
-    // KOTU:  position += Vector2(0, speed * dt);   // her karede yeni Vector2
-    // IYI:
+    // BAD:  position += Vector2(0, speed * dt);   // a new Vector2 every frame
+    // GOOD:
     _velocity.setValues(0, speed);
     position.addScaled(_velocity, dt);
   }
 }
 ```
 
-`Vector2` uzerinde `setValues`, `add`, `addScaled`, `scale` gibi *in-place* metotlari tercih edin; operatorler (`+`, `*`) yeni nesne uretir.
+Prefer *in-place* methods on `Vector2` such as `setValues`, `add`, `addScaled`, and `scale`; operators (`+`, `*`) produce new objects.
 
 ---
 
-## 3. Nesne havuzu (object pooling): ekle/cikar churn'undan kacinin
+## 3. Object pooling: avoid add/remove churn
 
-Mermi, parcacik, dusman gibi sik olusup yok olan nesnelerde `add()`/`removeFromParent()` dongusu hem GC baskisi hem de component agaci yeniden yapilandirma maliyeti yaratir. Bunun yerine **havuzdan yeniden kullanin**: nesneyi yok etmek yerine pasiflestirip (ornek: ekran disina alip `removeFromParent` yapmadan) tekrar aktive edin.
+For objects that are created and destroyed frequently, such as bullets, particles, and enemies, the `add()`/`removeFromParent()` cycle creates both GC pressure and the cost of restructuring the component tree. Instead, **reuse from a pool**: rather than destroying the object, deactivate it (e.g. move it off-screen without calling `removeFromParent`) and reactivate it later.
 
 ```dart
 class BulletPool {
@@ -80,11 +80,11 @@ class BulletPool {
 }
 ```
 
-Anahtar fikir: nesneyi component agacindan cikarmak yerine `isActive` bayragiyla pasiflestirip yeniden kullanmak. Bu, hot-path'te tahsisi sifirlar.
+The key idea: instead of removing the object from the component tree, deactivate it with an `isActive` flag and reuse it. This zeroes out allocation in the hot path.
 
-### 3.1 `RecycledQueue` ile yerlesik geri donusum
+### 3.1 Built-in recycling with `RecycledQueue`
 
-Flame, ayni amac icin yerlesik bir `RecycledQueue<T extends Disposable>` sunar: elemanlari **olusturup sahiplenen**, kuyruktan cikinca yok etmek yerine `dispose` edip yeniden kullanim havuzuna birakan FIFO kuyrugu. Yeni eleman eklendiginde onceden dispose edilmis elemanlar tekrar kullanilir.
+For the same purpose, Flame offers a built-in `RecycledQueue<T extends Disposable>`: a FIFO queue that **creates and owns** its elements, and that, instead of destroying an element when it leaves the queue, `dispose`s it and returns it to the reuse pool. When a new element is added, previously disposed elements are reused.
 
 ```dart
 class Particle implements Disposable {
@@ -99,7 +99,7 @@ class Particle implements Disposable {
 final particles = RecycledQueue<Particle>(Particle.new, initialCapacity: 128);
 
 void spawn(double px, double py) {
-  // addLast yeni (veya geri donusturulmus) bir eleman uretir, doldurmasi sizde.
+  // addLast produces a new (or recycled) element; filling it is up to you.
   final p = particles.addLast()
     ..x = px
     ..y = py
@@ -110,19 +110,19 @@ void tick(double dt) {
   for (final p in particles) {
     p.life -= dt;
     if (p.life <= 0) {
-      particles.removeCurrent(); // iterasyon sirasinda guvenli
+      particles.removeCurrent(); // safe during iteration
     }
   }
 }
 ```
 
-> `RecycledQueue` API'si klasik Queue'dan farklidir: `addLast` yeni eleman uretip doldurmaniz icin geri verir; `removeFirst` ilk elemani **dondurmeden** siler (oncesinde `first` ile alin). Iterasyon sirasinda `removeCurrent` ve `addLast` ile degistirilebilir; ayni anda yalnizca bir iterator desteklenir.
+> The `RecycledQueue` API differs from a classic Queue: `addLast` produces a new element and hands it back for you to fill; `removeFirst` deletes the first element **without returning it** (get it beforehand with `first`). It can be modified during iteration with `removeCurrent` and `addLast`; only one iterator is supported at a time.
 
 ---
 
-## 4. Cok sayida statik gövde icin `HasQuadTreeCollisionDetection`
+## 4. `HasQuadTreeCollisionDetection` for many static bodies
 
-Çok sayida collidable nesnesi olan genis oyun alanlarinda (yuzlercesi, ozellikle statik govdeler) varsayilan sweep-and-prune yavaşlar. Bu durumda standart `HasCollisionDetection` yerine `HasQuadTreeCollisionDetection` kullanip baslatın.
+In large game areas with many collidable objects (hundreds of them, especially static bodies), the default sweep-and-prune slows down. In that case, use `HasQuadTreeCollisionDetection` instead of the standard `HasCollisionDetection`, and initialize it.
 
 ```dart
 class MyGame extends FlameGame with HasQuadTreeCollisionDetection {
@@ -136,27 +136,27 @@ class MyGame extends FlameGame with HasQuadTreeCollisionDetection {
 }
 ```
 
-`initializeCollisionDetection` parametreleri:
+`initializeCollisionDetection` parameters:
 
-- **`mapDimensions`** (zorunlu): Quad tree'nin uzamsal sinirlari (`Rect`).
-- **`minimumDistance`** (ops.): Carpisma kontrolu oncesi minimum mesafe; `null` (varsayilan) kontrolu kapatir.
-- **`maxObjects`** (ops., varsayilan 25): Bir kadran basina maksimum nesne.
-- **`maxDepth`** (ops., varsayilan 10): Kadran ic ice yuvalanma derinligi.
+- **`mapDimensions`** (required): The spatial bounds of the quad tree (`Rect`).
+- **`minimumDistance`** (opt.): Minimum distance before a collision check; `null` (default) disables the check.
+- **`maxObjects`** (opt., default 25): Maximum objects per quadrant.
+- **`maxDepth`** (opt., default 10): Quadrant nesting depth.
 
-Hitbox'larda `onComponentTypeCheck` override ederek uyumsuz tipleri carpisma kontrolu oncesi eleyebilirsiniz (ek hizlanma).
+On hitboxes, you can override `onComponentTypeCheck` to eliminate incompatible types before the collision check (additional speedup).
 
-> Flame dokumantasyonu uyarir: "Her zaman farkli yaklasimları deneyin ve oyununuzda nasil performans gosterdiklerini olcun. Daha sofistike yaklasimin her zaman daha hizli olacagini varsaymayin." Az nesneli oyunlarda varsayilan algoritma daha hizli olabilir.
+> The Flame documentation warns: "Always try out different approaches and measure how they perform in your game. Do not assume that the more sophisticated approach will always be faster." In games with few objects, the default algorithm may be faster.
 
 ---
 
-## 5. `pauseEngine` / `resumeEngine` ile bos islemden kacinma
+## 5. Avoiding idle work with `pauseEngine` / `resumeEngine`
 
-Oyun pause edildiginde veya bir Flutter overlay/dialog acikken `update` dongusunu durdurmak hem CPU/GPU hem de pil tasarrufu saglar.
+When the game is paused or a Flutter overlay/dialog is open, stopping the `update` loop saves both CPU/GPU and battery.
 
 ```dart
 class MyGame extends FlameGame {
   void openPauseMenu() {
-    pauseEngine();              // update/render dongusunu durdurur
+    pauseEngine();              // stops the update/render loop
     overlays.add('PauseMenu');
   }
 
@@ -167,13 +167,13 @@ class MyGame extends FlameGame {
 }
 ```
 
-`paused` getter'i ile durum okunabilir; `paused = true/false` ile de ayarlanabilir. Pause sirasinda Flutter overlay'leri etkilesimli kalir.
+The state can be read with the `paused` getter; it can also be set with `paused = true/false`. During a pause, Flutter overlays remain interactive.
 
 ---
 
-## 6. FPS olcumu: `FpsTextComponent` ve `debugMode`
+## 6. FPS measurement: `FpsTextComponent` and `debugMode`
 
-Optimizasyonu **olcerek** dogrulayin. Flame, ekranda anlik FPS gosteren `FpsTextComponent` sunar (`FpsComponent` salt-hesap versiyonudur).
+Verify optimization **by measuring**. Flame offers `FpsTextComponent`, which shows the instantaneous FPS on screen (`FpsComponent` is the compute-only version).
 
 ```dart
 class MyGame extends FlameGame {
@@ -188,7 +188,7 @@ class MyGame extends FlameGame {
 }
 ```
 
-`debugMode` ile component sinirlari, anchor'lar ve hitbox'lar cizilir — yerlesim/carpisma sorunlarini ayiklamak icin:
+With `debugMode`, component bounds, anchors, and hitboxes are drawn — for debugging layout/collision problems:
 
 ```dart
 class MyGame extends FlameGame {
@@ -197,22 +197,22 @@ class MyGame extends FlameGame {
 }
 ```
 
-Ayrica bir component bazinda `component.debugMode = true` ayarlanabilir. Yayina cikmadan once `debugMode`'u kapatin (ek cizim maliyeti).
+You can also set `component.debugMode = true` on a per-component basis. Turn `debugMode` off before release (additional draw cost).
 
 ---
 
-## 7. Hizli kontrol listesi (her oyun icin)
+## 7. Quick checklist (for each game)
 
-- [ ] Tum image/audio `onLoad` icinde `loadAll` ile preload edildi.
-- [ ] `update()` icinde yeni `Vector2`/liste/closure tahsisi yok; in-place metotlar kullanildi.
-- [ ] Sik olusan nesneler (mermi, parcacik) havuzdan/`RecycledQueue` ile yeniden kullaniliyor; `add`/`remove` churn'u yok.
-- [ ] Yuzlerce collidable varsa `HasQuadTreeCollisionDetection` denendi ve olculdu.
-- [ ] Pause/overlay aciklarken `pauseEngine()` cagriliyor.
-- [ ] Gelistirmede `FpsTextComponent` ile 60 FPS dogrulandi; yayinda `debugMode = false`.
+- [ ] All images/audio preloaded with `loadAll` inside `onLoad`.
+- [ ] No new `Vector2`/list/closure allocation inside `update()`; in-place methods used.
+- [ ] Frequently created objects (bullets, particles) reused via a pool/`RecycledQueue`; no `add`/`remove` churn.
+- [ ] If there are hundreds of collidables, `HasQuadTreeCollisionDetection` tried and measured.
+- [ ] `pauseEngine()` is called when opening a pause/overlay.
+- [ ] 60 FPS verified in development with `FpsTextComponent`; `debugMode = false` in release.
 
 ---
 
-## Kaynaklar
+## Sources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/collision_detection.md
 - https://raw.githubusercontent.com/flame-engine/flame/main/packages/flame/lib/src/components/core/recycled_queue.dart

@@ -1,41 +1,41 @@
 # Onboarding / FTUE (First-Time User Experience)
 
-Oyunun en yüksek-kaldıraçlı kısmı. İlk oturumda uygulamaların **%70–90'ı** kullanıcı kaybeder; **D1 retention sonraki her metriğe tavan koyar** (%80 D1-kaybı, D7'yi %20 altına sıkıştırır). FTUE kabaca **ilk 60 saniye** (hook) + **ilk 15 dakika** (derinliği kanıtlama).
+The highest-leverage part of the game. **70–90%** of apps lose the user in the first session; **D1 retention caps every later metric** (an 80% D1-loss squeezes D7 below 20%). FTUE is roughly the **first 60 seconds** (hook) + the **first 15 minutes** (proving the depth).
 
-> İlgili: ilk oturumun interest curve'ü → `03-difficulty-and-pacing.md`; sözsüz öğretme/teach-then-test → `02-level-design-principles.md`.
-
----
-
-## Kurallar
-
-- **Show, don't tell.** Metin duvarıyla değil aksiyonla öğret. İlk düşman gelince combat'ı anlatmak yerine saldırı tuşunda görsel ipucu yak (kinesthetic learning — yaparak öğrenme).
-- **Tek seferde tek mekanik ("skill atom").** İzole beceriyi tanıt, küçük bir başarıya kadar denet, sonra bir sonrakini. Aynı anda çok yeni mekanik istifleme (Cook'un skill-chain'i: basit zıplama → platform zıplama → engel → level bitirme).
-- **Progressive disclosure.** Yalnızca o anki görevin kontrol/UI'sini göster. Meta sistemleri (shop, upgrade, sosyal) ihtiyaç doğana dek gizle — meta katmanı ilk 3–5 oturumda aç, ekran 1'de değil.
-- **Time-to-fun'ı agresif düşür.** Oyuncu ~10–15 saniyede gerçekten oynuyor olsun. Hedef: "devam etmek istenen deneyime en kısa yol."
-- **Contextual > forced tutorial.** Rehberliği bağlamda tetikle (just-in-time), uzun öne-yığılmış zorunlu akış yerine. Zorunluysa kısa/atlanabilir tut.
-- **Sıkı feedback loop.** Her aksiyona hızlı, juicy feedback; ustalık-öncesi hüsran fazında öğrenmeyi hızlandırır.
-- **Tutorial drop-off'u ölç.** Hangi adımda terk ediliyor adım-adım izle; her düşüş noktası düzeltilebilir bir funnel sızıntısıdır.
-- **Önce eğlence, sonra monetizasyon.** İlk oturumlarda az/sıfır reklam, paywall yok; erken agresif monetizasyon düşük D1'in baş sebebidir.
+> Related: the interest curve of the first session → `03-difficulty-and-pacing.md`; wordless teaching/teach-then-test → `02-level-design-principles.md`.
 
 ---
 
-## Kaçınılacak failure mode'lar
+## Rules
 
-- Metin-ağırlıklı giriş ekranları.
-- Oyuncunun henüz kullanamayacağı mekaniği öğretmek (düşük algılanan değer → hızlı hüsran).
-- İlk gerçek kazanımı geciktiren aşırı-uzun tutorial.
-
----
-
-## Implicit-tutorial felsefesi (Valve/Portal ile uyumlu)
-
-- **Level'ın kendisi tutorial'dır:** tek mantıklı aksiyonun ders olduğu bir durum tasarla, oyuncuya keşfettir.
-- Çıkarımı ödüllendir — "anladım!" anı ödülün kendisidir.
-- Güvenli öğret, baskı altında sına. Yeni mekanikleri tek tek; birden istifleyince test oyuncuları frustre oldu (Portal erken build'leri).
+- **Show, don't tell.** Teach with action, not a wall of text. When the first enemy arrives, instead of explaining combat, light a visual cue on the attack button (kinesthetic learning — learning by doing).
+- **One mechanic at a time ("skill atom").** Introduce an isolated skill, test until a small success, then the next. Don't stack many new mechanics at once (Cook's skill chain: basic jump → platform jump → obstacle → finishing the level).
+- **Progressive disclosure.** Show only the controls/UI of the current task. Hide meta systems (shop, upgrade, social) until the need arises — open the meta layer over the first 3–5 sessions, not on screen 1.
+- **Aggressively reduce time-to-fun.** The player should actually be playing within ~10–15 seconds. Goal: "the shortest path to the experience worth continuing."
+- **Contextual > forced tutorial.** Trigger guidance in context (just-in-time) rather than a long front-loaded mandatory flow. If mandatory, keep it short/skippable.
+- **Tight feedback loop.** Fast, juicy feedback on every action; it accelerates learning during the pre-mastery frustration phase.
+- **Measure tutorial drop-off.** Track step-by-step where it's abandoned; every drop point is a fixable funnel leak.
+- **Fun first, monetization later.** Few/zero ads and no paywall in the first sessions; early aggressive monetization is a leading cause of low D1.
 
 ---
 
-## Kaynaklar
+## Failure modes to avoid
+
+- Text-heavy intro screens.
+- Teaching a mechanic the player can't use yet (low perceived value → quick frustration).
+- An over-long tutorial that delays the first real reward.
+
+---
+
+## Implicit-tutorial philosophy (aligned with Valve/Portal)
+
+- **The level itself is the tutorial:** design a situation where the only sensible action is the lesson, and let the player discover it.
+- Reward the inference — the "I get it!" moment is the reward itself.
+- Teach safely, test under pressure. New mechanics one at a time; stacking them at once frustrated test players (early Portal builds).
+
+---
+
+## Sources
 
 - Best Practices for Mobile Game Onboarding — Adrian Crook: https://adriancrook.com/best-practices-for-mobile-game-onboarding/
 - FTUE & Onboarding — Mobile Game Doctor: https://mobilegamedoctor.com/2025/05/30/ftue-onboarding-whats-in-a-name/

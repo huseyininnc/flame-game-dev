@@ -1,50 +1,50 @@
-# Yeni Flame Oyunu — Kontrol Listesi
+# New Flame Game — Checklist
 
-## 0. Konsept
-- [ ] Tür ve temel döngü tek cümlede tanımlandı.
-- [ ] Girdi modeli: dokunmatik / joystick / klavye / tap.
-- [ ] Yönlendirme (portrait/landscape) ve hedef çözünürlük (fixed-resolution mı?).
-- [ ] Platform hedefleri (Android/iOS/web/desktop).
+## 0. Concept
+- [ ] Genre and core loop defined in a single sentence.
+- [ ] Input model: touch / joystick / keyboard / tap.
+- [ ] Orientation (portrait/landscape) and target resolution (fixed-resolution?).
+- [ ] Platform targets (Android/iOS/web/desktop).
 
-## 1. İskele
-- [ ] VGV `create-project` (`flame_game`) ile oluşturuldu; org + ad (`_` ile).
+## 1. Scaffold
+- [ ] Created with VGV `create-project` (`flame_game`); org + name (with `_`).
 - [ ] `analysis_options.yaml` → `very_good_analysis` include.
-- [ ] Bağımlılıklar: `flame`, gerekiyorsa `flame_audio`, `flame_bloc`, `flame_tiled`.
-- [ ] `pubspec.yaml` asset klasörleri: `assets/images/`, `assets/audio/`, `assets/tiles/`.
+- [ ] Dependencies: `flame`, plus `flame_audio`, `flame_bloc`, `flame_tiled` if needed.
+- [ ] `pubspec.yaml` asset folders: `assets/images/`, `assets/audio/`, `assets/tiles/`.
 
-## 2. Mimari (references/flame/10)
-- [ ] Oyun `game_core`'daki `BaseFlameGame`'i extend ediyor.
-- [ ] Oyuna özel kod `apps/<game>/lib/game` altında.
-- [ ] Kalıcılık (yüksek skor vb.) `*_repository` paketinde, Flame'den bağımsız.
-- [ ] Bağımlılık yönü tek yönlü: feature → core → repository.
+## 2. Architecture (references/flame/10)
+- [ ] The game extends `BaseFlameGame` from `game_core`.
+- [ ] Game-specific code lives under `apps/<game>/lib/game`.
+- [ ] Persistence (high score, etc.) in the `*_repository` package, independent of Flame.
+- [ ] Dependency direction is one-way: feature → core → repository.
 
-## 3. Durum
-- [ ] Skor/can/faz Bloc veya Cubit'te.
-- [ ] `FlameBlocProvider`/`FlameMultiBlocProvider` ile sağlandı.
-- [ ] Component'ler `FlameBlocReader` (event) / `FlameBlocListenable` (state) ile bağlı.
-- [ ] Component'ler karar vermiyor; yalnızca okuyup çiziyor.
+## 3. State
+- [ ] Score/lives/phase in a Bloc or Cubit.
+- [ ] Provided via `FlameBlocProvider`/`FlameMultiBlocProvider`.
+- [ ] Components are wired with `FlameBlocReader` (event) / `FlameBlocListenable` (state).
+- [ ] Components don't make decisions; they only read and render.
 
-## 4. Ekranlar
-- [ ] Menü/ayar/level → `RouterComponent` + `Route`/`WorldRoute`.
-- [ ] HUD → kalıcı overlay veya `camera.viewport`.
+## 4. Screens
+- [ ] Menu/settings/level → `RouterComponent` + `Route`/`WorldRoute`.
+- [ ] HUD → persistent overlay or `camera.viewport`.
 - [ ] Pause → `pauseEngine()` + `overlays.add`.
-- [ ] Game over → overlay; tekrar oyna akışı.
-- [ ] **Her overlay `Material(type: MaterialType.transparency, child: ...)` ile sarıldı** (yoksa çıplak `Text`'ler sarı altı-çizgiyle çıkar).
-- [ ] Overlay'ler `SafeArea` + `ConstrainedBox(maxWidth)` ile responsive.
+- [ ] Game over → overlay; play-again flow.
+- [ ] **Every overlay wrapped in `Material(type: MaterialType.transparency, child: ...)`** (otherwise bare `Text`s render with a yellow underline).
+- [ ] Overlays responsive with `SafeArea` + `ConstrainedBox(maxWidth)`.
 
-## 5. Assetler
-- [ ] Görseller webp (sanat yönü oyuna göre), `assets/images/` altında, pubspec'te kayıtlı.
-- [ ] Ses sfx/bgm `assets/audio/` altında.
-- [ ] Tüm asset `onLoad`'da preload (`images.loadAll`, `audioCache.loadAll`).
+## 5. Assets
+- [ ] Images as webp (art direction per game), under `assets/images/`, registered in pubspec.
+- [ ] Audio sfx/bgm under `assets/audio/`.
+- [ ] All assets preloaded in `onLoad` (`images.loadAll`, `audioCache.loadAll`).
 
-## 6. Performans (references/flame/11)
-- [ ] `update()` içinde yeni `Vector2`/liste/closure yok.
-- [ ] Sık nesnelerde object pooling / `RecycledQueue`.
-- [ ] Çok sayıda statik gövdede `HasQuadTreeCollisionDetection` ölçüldü.
-- [ ] Geliştirmede `FpsTextComponent`; yayında `debugMode = false`.
+## 6. Performance (references/flame/11)
+- [ ] No new `Vector2`/list/closure inside `update()`.
+- [ ] Object pooling / `RecycledQueue` for frequent objects.
+- [ ] `HasQuadTreeCollisionDetection` measured for many static bodies.
+- [ ] `FpsTextComponent` in development; `debugMode = false` in release.
 
-## 7. Doğrulama
-- [ ] `run`/`verify` ile gerçek cihaz/emülatörde çalıştırıldı.
-- [ ] 60 FPS gözlemlendi.
-- [ ] `dart` MCP ile runtime hatası kontrolü (gerekirse).
-- [ ] Lint temiz; kodda yorum yok.
+## 7. Verification
+- [ ] Run on a real device/emulator with `run`/`verify`.
+- [ ] 60 FPS observed.
+- [ ] Runtime error check with the `dart` MCP (if needed).
+- [ ] Lint clean; no comments in code.

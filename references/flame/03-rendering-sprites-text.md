@@ -1,12 +1,12 @@
-# Flame: Sprite, Görsel ve Metin Render
+# Flame: Sprite, Image, and Text Rendering
 
-Bu doküman Flame (kararlı 1.x) ile görsel yükleme, `Sprite`, `SpriteComponent`, sprite sheet, animasyon ve metin render konularını kapsar.
+This document covers image loading, `Sprite`, `SpriteComponent`, sprite sheets, animation, and text rendering with Flame (stable 1.x).
 
-## 1. Görsel Yükleme
+## 1. Image Loading
 
-Flame, asset'lerden görsel yükleyip önbelleğe alan bir `Images` yardımcı sınıfı sağlar. Görseller `assets/images/` altında bulunmalı ve `pubspec.yaml` içinde tanımlanmalıdır.
+Flame provides an `Images` helper class that loads images from assets and caches them. Images must be located under `assets/images/` and declared in `pubspec.yaml`.
 
-### Images sınıfı ve global cache
+### The Images class and the global cache
 
 ```dart
 import 'package:flame/cache.dart';
@@ -15,9 +15,9 @@ final imagesLoader = Images();
 final image = await imagesLoader.load('yourImage.png');
 ```
 
-`Images` cache yönetim metodları: `load`, `loadAll`, `clear`, `clearCache`, `fromCache`, `add` ve `keys` getter'ı.
+`Images` cache management methods: `load`, `loadAll`, `clear`, `clearCache`, `fromCache`, `add`, and the `keys` getter.
 
-Global singleton üzerinden:
+Via the global singleton:
 
 ```dart
 import 'package:flame/flame.dart';
@@ -27,9 +27,9 @@ final image = await Flame.images.load('player.png');
 final playerSprite = Sprite(image);
 ```
 
-### Oyun seviyesinde görsel yönetimi
+### Image management at the game level
 
-`Game` sınıfı, widget ağacından kaldırıldığında cache'i otomatik temizleyen bir `images` örneği barındırır.
+The `Game` class holds an `images` instance that automatically clears its cache when the game is removed from the widget tree.
 
 ```dart
 class MyGame extends FlameGame {
@@ -43,7 +43,7 @@ class MyGame extends FlameGame {
 }
 ```
 
-Cache'lenmiş görseli oyun sırasında almak için `images.fromCache`:
+To retrieve a cached image during gameplay, use `images.fromCache`:
 
 ```dart
 @override
@@ -58,16 +58,16 @@ void shoot() {
 
 ## 2. Sprite
 
-`Sprite`, bir görseli ya da görselin bir bölgesini temsil eder.
+A `Sprite` represents an image or a region of an image.
 
 ```dart
 final image = await images.load('player.png');
 final player = Sprite(image);
 ```
 
-### Sprite sheet'ten bölge alma
+### Taking a region from a sprite sheet
 
-`srcPosition` varsayılan `(0.0, 0.0)`, `srcSize` varsayılan `null`'dur (tam görsel boyutu).
+`srcPosition` defaults to `(0.0, 0.0)`, and `srcSize` defaults to `null` (the full image size).
 
 ```dart
 final image = await images.load('player.png');
@@ -80,21 +80,21 @@ final playerFrame = Sprite(
 
 ### Render
 
-`render` metodu canvas, genişlik ve yükseklik alır; isteğe bağlı `overridePaint` ve "ghost line"ları önleyen `bleed` parametreleri vardır.
+The `render` method takes a canvas, width, and height; it also has optional `overridePaint` and `bleed` parameters, the latter of which prevents "ghost lines".
 
 ```dart
 final block = Sprite(await images.load('block.png'));
 block.render(canvas, 16.0, 16.0);
 
-// Sprite bleeding (kenar taşması) önleme
+// Prevent sprite bleeding (edge overflow)
 playerFrame.render(canvas, 16.0, 16.0, bleed: 1.0);
 ```
 
 ## 3. SpriteComponent
 
-`SpriteComponent`, statik sprite göstermek için `PositionComponent`'in birincil uygulamasıdır.
+`SpriteComponent` is the primary implementation of `PositionComponent` for displaying a static sprite.
 
-Önemli constructor parametreleri: `sprite`, `size`, `position` (varsayılan `Vector2(0,0)`), `angle` (radyan, varsayılan `0`), `anchor`, ve sprite bleeding için `bleed`.
+Key constructor parameters: `sprite`, `size`, `position` (defaults to `Vector2(0,0)`), `angle` (radians, defaults to `0`), `anchor`, and `bleed` for sprite bleeding.
 
 ```dart
 @override
@@ -110,7 +110,7 @@ Future<void> onLoad() async {
 }
 ```
 
-Bleeding'i component üzerinde uygulamak:
+Applying bleeding on the component:
 
 ```dart
 final spriteComponent = SpriteComponent(
@@ -122,7 +122,7 @@ final spriteComponent = SpriteComponent(
 
 ## 4. SpriteSheet
 
-`SpriteSheet`, sprite sheet'ten sprite ve animasyon çıkarımını basitleştirir.
+`SpriteSheet` simplifies extracting sprites and animations from a sprite sheet.
 
 ```dart
 import 'package:flame/sprite.dart';
@@ -132,28 +132,28 @@ final spriteSheet = SpriteSheet(
   srcSize: Vector2.all(16.0),
 );
 
-// Bir satırdan animasyon oluştur (row index 0)
+// Create an animation from a row (row index 0)
 final animation = spriteSheet.createAnimation(0, stepTime: 0.1);
 ```
 
-Statik sprite çıkarımı:
+Extracting a static sprite:
 
 ```dart
-spriteSheet.getSpriteById(2); // id ile
-spriteSheet.getSprite(0, 0);  // satır, sütun ile
+spriteSheet.getSpriteById(2); // by id
+spriteSheet.getSprite(0, 0);  // by row, column
 ```
 
 ## 5. SpriteAnimation
 
-Eşit boyutlu sprite'lardan döngüsel animasyon oluşturur.
+Creates a looping animation from equally sized sprites.
 
-### Sprite listesinden
+### From a list of sprites
 
 ```dart
 final animation = SpriteAnimation.spriteList(sprites, stepTime: 0.02);
 ```
 
-### Frame data ile (sprite sheet'ten)
+### With frame data (from a sprite sheet)
 
 ```dart
 const amountOfFrames = 8;
@@ -169,7 +169,7 @@ final animation = SpriteAnimation.fromFrameData(
 
 ### SpriteAnimationTicker
 
-Animasyonun zaman ilerlemesini `SpriteAnimationTicker` yönetir. Bir component dışında kendi animasyonunu yönetirken doğrudan kullanılabilir.
+`SpriteAnimationTicker` manages the time progression of an animation. It can be used directly when managing your own animation outside of a component.
 
 ```dart
 class MyGame extends Game {
@@ -189,15 +189,15 @@ class MyGame extends Game {
 
 ## 6. SpriteAnimationComponent
 
-Çok kareli döngüsel animasyonları gösterir.
+Displays multi-frame looping animations.
 
-Önemli constructor parametreleri:
-- `animation`: oynatılacak `SpriteAnimation`
-- `size`: Vector2 boyut
-- `autoPlay`: otomatik başlasın mı
-- `playing`: anlık oynatma durumu
-- `removeOnFinish`: animasyon bitince component kaldırılsın mı
-- `resetOnRemove`: kaldırılınca ilk kareye dönsün mü
+Key constructor parameters:
+- `animation`: the `SpriteAnimation` to play
+- `size`: Vector2 size
+- `autoPlay`: whether to start automatically
+- `playing`: the current playback state
+- `removeOnFinish`: whether to remove the component when the animation finishes
+- `resetOnRemove`: whether to return to the first frame when removed
 
 ```dart
 @override
@@ -215,22 +215,22 @@ Future<void> onLoad() async {
 }
 ```
 
-### animationTicker ve callback'ler
+### animationTicker and callbacks
 
-Component, dahili bir `SpriteAnimationTicker`'ı `animationTicker` property'si ile sunar. Ticker `onStart`, `onFrame(int index)` ve `onComplete` callback'leri ile `completed` future'ını sağlar.
+The component exposes an internal `SpriteAnimationTicker` through the `animationTicker` property. The ticker provides `onStart`, `onFrame(int index)`, and `onComplete` callbacks, along with a `completed` future.
 
 ```dart
 final ticker = SpriteAnimationTicker(animation)
-  ..onStart = () { /* başladı */ }
-  ..onFrame = (index) { /* kare değişti */ }
-  ..onComplete = () { /* bitti */ };
+  ..onStart = () { /* started */ }
+  ..onFrame = (index) { /* frame changed */ }
+  ..onComplete = () { /* finished */ };
 
-await ticker.completed; // bitince çözülür
+await ticker.completed; // resolves when finished
 ```
 
 ### SpriteAnimationGroupComponent
 
-Birden çok adlandırılmış animasyonu yönetir ve aralarında geçiş yapar. `current` ile aktif durum belirlenir.
+Manages multiple named animations and transitions between them. The active state is set via `current`.
 
 ```dart
 enum RobotState { idle, running }
@@ -243,16 +243,16 @@ final robot = SpriteAnimationGroupComponent<RobotState>(
   current: RobotState.idle,
 );
 
-robot.current = RobotState.running; // animasyon değiştir
+robot.current = RobotState.running; // change animation
 
-// Durum bazlı ticker callback'leri
+// State-based ticker callbacks
 robot.animationTickers?[RobotState.running]?.onStart = () {};
 robot.animationTickers?[RobotState.idle]?.onFrame = (index) {};
 ```
 
 ### SpriteGroupComponent
 
-`SpriteAnimationGroupComponent`'in statik sprite karşılığı.
+The static-sprite counterpart of `SpriteAnimationGroupComponent`.
 
 ```dart
 class PlayerComponent extends SpriteGroupComponent<ButtonState> {
@@ -267,11 +267,11 @@ class PlayerComponent extends SpriteGroupComponent<ButtonState> {
 }
 ```
 
-## 7. Metin Render
+## 7. Text Rendering
 
 ### TextComponent
 
-`TextComponent` tek satır metin render eder.
+`TextComponent` renders a single line of text.
 
 ```dart
 class MyGame extends FlameGame {
@@ -287,9 +287,9 @@ class MyGame extends FlameGame {
 }
 ```
 
-### TextPaint ve styling
+### TextPaint and styling
 
-Render özelliklerini özelleştirmek için bir `TextRenderer` verilir. En basit uygulaması, Flutter `TextStyle`'ını alan `TextPaint`'tir.
+A `TextRenderer` is supplied to customize render properties. Its simplest implementation is `TextPaint`, which takes a Flutter `TextStyle`.
 
 ```dart
 import 'package:flame/text.dart';
@@ -316,7 +316,7 @@ class MyGame extends FlameGame {
 }
 ```
 
-Sık kullanılan `TextStyle` özellikleri: `fontFamily` (pubspec'teki özel fontlar dahil), `fontSize` (varsayılan 24.0), `height` (satır yüksekliği çarpanı), `color` (varsayılan beyaz).
+Commonly used `TextStyle` properties: `fontFamily` (including custom fonts from pubspec), `fontSize` (defaults to 24.0), `height` (line-height multiplier), `color` (defaults to white).
 
 ```dart
 const textPaint = TextPaint(
@@ -329,7 +329,7 @@ const textPaint = TextPaint(
 
 ### TextRenderer
 
-`TextRenderer`, metni render'a hazır `TextElement`'e dönüştüren soyut sınıftır. Anahtar metotlar: `TextElement format(String text)`, `LineMetrics getLineMetrics(String text)`, ve `render(...)`.
+`TextRenderer` is the abstract class that converts text into a render-ready `TextElement`. Key methods: `TextElement format(String text)`, `LineMetrics getLineMetrics(String text)`, and `render(...)`.
 
 ```dart
 textRenderer.render(
@@ -340,9 +340,9 @@ textRenderer.render(
 );
 ```
 
-Hazır uygulamalar: `TextPaint` (Flutter tabanlı), `SpriteFontRenderer` (bitmap font), `DebugTextRenderer` (golden testleri).
+Ready-made implementations: `TextPaint` (Flutter-based), `SpriteFontRenderer` (bitmap font), `DebugTextRenderer` (golden tests).
 
-## Kaynaklar
+## Resources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/rendering/images.md
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/rendering/text_rendering.md

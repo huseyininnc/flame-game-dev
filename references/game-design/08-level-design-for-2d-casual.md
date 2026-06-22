@@ -1,24 +1,24 @@
-# 2D / Puzzle / Casual / Idle için Level Design (uygulama)
+# Level Design for 2D / Puzzle / Casual / Idle (implementation)
 
-Bu doküman 02 ve 03'teki ilkeleri **kod güdümlü bir motorda (Flutter Flame)** uygular. Bu workspace'in seri üretimi için en pratik dosyadır.
+This document applies the principles from 02 and 03 in a **code-driven engine (Flutter Flame)**. It is the most practical file for the serial production of this workspace.
 
 ---
 
 ## 1. Handcrafted vs procedural
 
-- Sektör puzzle level'larını **ezici çoğunlukla elle tasarlar.** Saf prosedürel üretim genelde imkânsız/trivial/sıkıcı level üretir. Match-3, block-puzzle, merge stüdyoları elle yazar, sonra **veriyle tune eder.**
-- Prosedürel; **sonsuz/endless mod** için veya **içerik-asisti** (aday üret → elle ayıkla) olarak uygundur, ana kampanya için değil.
+- The industry designs puzzle levels **overwhelmingly by hand.** Pure procedural generation usually produces impossible/trivial/boring levels. Match-3, block-puzzle, and merge studios author by hand, then **tune with data.**
+- Procedural is suitable for an **infinite/endless mode** or as a **content assistant** (generate candidates → curate by hand), not for the main campaign.
 
 ---
 
-## 2. Levels-as-data (motor mimari kuralı)
+## 2. Levels-as-data (engine architecture rule)
 
-**Level verisini motor kodundan ayır.** Level'lar config'tir (JSON / Tiled / custom DSL), runtime'da parse edilir — **asla hardcode edilmez.** Böylece tasarımcı yeniden derlemeden iterate eder ve live-ops yeni paketleri **veri olarak** gönderir.
+**Separate level data from engine code.** Levels are config (JSON / Tiled / custom DSL), parsed at runtime — **never hardcoded.** This lets the designer iterate without recompiling, and lets live-ops ship new packs **as data.**
 
-- **Tiled + JSON** de-facto pipeline'dır: Tiled'da görsel tasarla → JSON export → motorda parse. Flame'de `flame_tiled` (bkz. `references/flame/08-audio-and-tiled.md`).
-- **Tek generic `LevelConfig` şeması + tek `LevelLoader`** her level'ı sürsün — **parametrik/şablon-tabanlı level'lar** her-level-için-özel-kod'u yener.
+- **Tiled + JSON** is the de-facto pipeline: design visually in Tiled → export JSON → parse in the engine. In Flame, `flame_tiled` (see `references/flame/08-audio-and-tiled.md`).
+- **A single generic `LevelConfig` schema + a single `LevelLoader`** should drive every level — **parametric/template-based levels** beat per-level custom code.
 
-**Örnek `LevelConfig` (kavramsal):**
+**Example `LevelConfig` (conceptual):**
 ```dart
 class LevelConfig {
   final int index;
@@ -26,71 +26,71 @@ class LevelConfig {
   final int rows;
   final ObjectiveType objective;   // collect / clearAll / survive / reachScore
   final int objectiveTarget;
-  final int moveLimit;             // veya timeLimit
+  final int moveLimit;             // or timeLimit
   final List<BlockerSpec> blockers;
   final List<PieceType> allowedPieces;
-  final Map<String, Object> extra; // tür-özel parametreler
+  final Map<String, Object> extra; // genre-specific parameters
 }
 ```
-Levelları `assets/levels/levelXXX.json` olarak tut; `LevelLoader.load(index)` parse edip `LevelConfig` döndürsün; component spawn'ı bu config'ten beslensin. Yeni level = yeni JSON; kod değişmez.
+Store levels as `assets/levels/levelXXX.json`; have `LevelLoader.load(index)` parse and return a `LevelConfig`; feed component spawning from this config. New level = new JSON; the code doesn't change.
 
 ---
 
-## 3. Zorluk eğrisi şablonu (casual/puzzle)
+## 3. Difficulty curve template (casual/puzzle)
 
-- **Sawtooth, lineer değil** (bkz. 03): birkaç level artan zorluk → bilerek **bir düşür** → tekrar tırman. Monoton zorluk churn yaratır.
-- **Casual şablonu:** **Level 1–20 kolay** (güven inşa + öğret), **~20–30 ilk hard spike**, kademeli yükseliş, **~50 sonrası büyük zorluk/paywall gate'leri.** Zor level'ı bilinçli yerleştir, ardına bir "ödül" (kolay) level koy.
-- Oyuncu becerisi yaşam boyu yükselir: 1–100 numaralı level ile 1000–1100 **aynı efektif zorlukta değildir.** Yeniden kalibre et.
-
----
-
-## 4. Moves vs objective (match-3 sayıları)
-
-- Modern standart **~15–20 hamle/level** (10 yıl önce ~50'ydi) — oyuncunun zamanına saygı.
-- **Hamleyi** birincil zorluk düğmesi olarak tune et; hamle azaldıkça win rate düşer.
-- Zorluk indeksi olarak **attempts-per-level (ortalama & medyan)** izle, ikili pass/fail değil.
+- **Sawtooth, not linear** (see 03): a few levels of rising difficulty → a deliberate **drop** → climb again. Monotone difficulty creates churn.
+- **Casual template:** **Levels 1–20 easy** (build confidence + teach), **~20–30 the first hard spike**, gradual rise, **big difficulty/paywall gates after ~50.** Place hard levels deliberately, and put a "reward" (easy) level right after.
+- Player skill rises over a lifetime: levels numbered 1–100 and 1000–1100 are **not at the same effective difficulty.** Recalibrate.
 
 ---
 
-## 5. Elde tuning döngüsü (somut reçete)
+## 4. Moves vs objective (match-3 numbers)
 
-- Level'ı kurduktan sonra **~10 kez üst üste oyna.** Kayıplarda kalan hedefi, kazançlarda kalan hamleyi kaydet.
-- Kırmızı bayrak: bir denemede **2 reshuffle** = level sorunlu; "zor" level'da sık sık **çok hamle kalmışken kazanmak** = fazla kolay.
-- Bütçe: ilk kurulum ~10–20 dk; **final balance level başına ~1 saat** ek tuning/test. **Zorunlu peer review** (ikinci tasarımcı).
-- Her level'ı **bir mini-hikâye** gibi kur: tek bir mekanik/öğenin özelliğini (düşme, bloklama, renk reaksiyonu) sergilesin; aynı fikri tekrarlama. **Board şeklini değiştir** ki "aynı level, farklı kaplama" yorgunluğu olmasın.
-
----
-
-## 6. Veri güdümlü tuning (soft-launch sonrası)
-
-- **Win rate ↔ moves** ilişkisini **shifted negative binomial** ile modelle (shift = gereken minimum hamle). Bir hamle değişiminin WR'a etkisini göndermeden öngörür.
-- Modelleme tabanı olarak **"vanilla win rate"** kullan (booster kullanılan denemeleri hariç tut) — oyuncular hamle biterken booster harcar, ham veriyi limit civarında bozar.
-- Her rebalance sonrası izlemeye devam (~%1.5 hata/hamle, sık outlier). Canlı veriyle **level sırasını değiştir** ve churn noktalarını (oyuncuların bıraktığı/uninstall ettiği spesifik level'lar) yumuşat.
+- The modern standard is **~15–20 moves/level** (it was ~50 a decade ago) — respecting the player's time.
+- Tune **moves** as the primary difficulty dial; as moves drop, win rate drops.
+- Track **attempts-per-level (mean & median)** as the difficulty index, not a binary pass/fail.
 
 ---
 
-## 7. Tür-özel yapılaştırma
+## 5. The hands-on tuning loop (a concrete recipe)
 
-- **Match-3:** ızgara + objective (X topla, jöle temizle, ingredient düşür) + hamle/süre limiti; blocker & booster artan karmaşıklık; çeşitli ızgara şekilleri.
-- **Block puzzle:** genelde endless/score-güdümlü, ayrık authored level yerine; zorluk board baskısından emerge eder; "level"lar parametrik (board boyutu, parça havuzu, spawn ağırlığı).
-- **Merge:** core = iki düşük öğe → üst tier; ~3 mekanik katmanı; ilerleme per-level-authored değil **unlock/ekonomi-paced.**
-- **Idle/incremental:** "level" yoktur; zorluk **ekonomi eğrisinden** gelir (maliyet/üretim formülleri); prestige duvarı pacing'i belirler. Eğri tasarımı = level design'ın bu türdeki karşılığıdır.
-
----
-
-## 8. Flame'e eşleme (uygulama kuralları)
-
-1. **Tek generic level şeması (JSON), tek loader; per-level kod yok.** (Flame: `assets/levels/*.json` + `LevelLoader`.)
-2. Zorluğu küçük bir **parametre setiyle** ayarla (moves, objective target, board şekli, blocker/booster seti, izinli parçalar).
-3. Elle yaz; prosedürel'i yalnızca endless mod için.
-4. Zorluk = **sawtooth**; 1–20 öğret, ilk spike ~20–30, spike'tan sonra relief level.
-5. **Attempts-per-level + drop-off'u ilk günden enstrümante et;** telemetriyle reorder/retune.
-6. Her level tek fikir öğretir/sergiler; şekilleri çeşitlendir; her level'ı peer-review et.
-7. Real-time aksiyon oyunlarında (örn. Mitomerge tipi merge-defense) "level" ≈ **wave/zone**: dalga sayısı, spawn aralığı, düşman HP/hız ölçeği, boss kadansı = senin LevelConfig'in. Aynı sawtooth + teach-then-test ilkeleri geçerli (yeni düşman/mekaniği güvenli bir dalgada tanıt, sonra kombinle).
+- After building a level, **play it ~10 times back to back.** On losses, record the remaining objective; on wins, record the remaining moves.
+- Red flag: **2 reshuffles** in one attempt = the level is problematic; on a "hard" level, frequently **winning with many moves left** = too easy.
+- Budget: initial setup ~10–20 min; **final balance ~1 hour per level** of extra tuning/testing. **Peer review is mandatory** (a second designer).
+- Build each level like a **mini-story**: it should showcase the property of a single mechanic/element (dropping, blocking, color reaction); don't repeat the same idea. **Change the board shape** so there's no "same level, different skin" fatigue.
 
 ---
 
-## Kaynaklar
+## 6. Data-driven tuning (post soft-launch)
+
+- Model the **win rate ↔ moves** relationship with a **shifted negative binomial** (shift = the minimum moves required). It predicts the effect of a move change on WR before shipping.
+- Use **"vanilla win rate"** as the modeling base (exclude attempts where boosters were used) — players spend boosters when moves run out, distorting the raw data near the limit.
+- Keep monitoring after every rebalance (~1.5% error/move, frequent outliers). With live data, **reorder the levels** and smooth out the churn points (the specific levels where players quit/uninstall).
+
+---
+
+## 7. Genre-specific structuring
+
+- **Match-3:** grid + objective (collect X, clear jelly, drop ingredients) + move/time limit; blockers & boosters add complexity; varied grid shapes.
+- **Block puzzle:** usually endless/score-driven rather than discrete authored levels; difficulty emerges from board pressure; "levels" are parametric (board size, piece pool, spawn weighting).
+- **Merge:** core = two low items → higher tier; ~3 layers of mechanics; progression is not per-level-authored but **unlock/economy-paced.**
+- **Idle/incremental:** there are no "levels"; difficulty comes from the **economy curve** (cost/production formulas); the prestige wall sets the pacing. Curve design = this genre's equivalent of level design.
+
+---
+
+## 8. Mapping to Flame (implementation rules)
+
+1. **A single generic level schema (JSON), a single loader; no per-level code.** (Flame: `assets/levels/*.json` + `LevelLoader`.)
+2. Adjust difficulty with a small **parameter set** (moves, objective target, board shape, blocker/booster set, allowed pieces).
+3. Author by hand; use procedural only for endless mode.
+4. Difficulty = **sawtooth**; teach in 1–20, first spike ~20–30, a relief level after the spike.
+5. **Instrument attempts-per-level + drop-off from day one;** reorder/retune with telemetry.
+6. Each level teaches/showcases a single idea; diversify the shapes; peer-review every level.
+7. In real-time action games (e.g. a Mitomerge-type merge-defense), a "level" ≈ **wave/zone**: wave count, spawn interval, enemy HP/speed scaling, boss cadence = your LevelConfig. The same sawtooth + teach-then-test principles apply (introduce a new enemy/mechanic in a safe wave, then combine).
+
+---
+
+## Sources
 
 - Smart & Casual: The State of Tile Puzzle Games Level Design — Game Developer / Room 8: https://www.gamedeveloper.com/design/smart-casual-the-state-of-tile-puzzle-games-level-design-part-1
 - Tuning Level Difficulty in Match-3: A Data-Driven Framework — Socialpoint: https://socialpoint-analytics.medium.com/tuning-level-difficulty-in-match-3-games-a-data-driven-framework-7b3cc07b2116

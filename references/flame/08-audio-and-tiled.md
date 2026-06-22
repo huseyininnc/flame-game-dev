@@ -229,7 +229,7 @@ for (final obj in objectGroup.objects) {
 }
 ```
 
-> Not: `obj.properties.getValue<T>(...)` ve `obj.class_` adlandırmaları `tiled` paketinden gelir ve majör sürümler arasında değişebilir; flame_tiled 3.1.1'in çözdüğü tiled sürümüne karşı derleyerek doğrulayın.
+> Note: the `obj.properties.getValue<T>(...)` and `obj.class_` names come from the `tiled` package and may change across major versions; verify by compiling against the `tiled` version that flame_tiled 3.1.1 resolves to.
 
 ### Accessing tile layers
 
@@ -243,7 +243,7 @@ final height = mapComponent.tileMap.map.height; // in tiles
 
 `mapComponent.tileMap` is a `RenderableTiledMap`; its `.map` field is the parsed `TiledMap` from the `tiled` package, giving access to dimensions, layers, and tilesets.
 
-## Kaynaklar
+## Sources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/bridge_packages/flame_audio/audio.md
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/bridge_packages/flame_audio/bgm.md

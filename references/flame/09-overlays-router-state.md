@@ -1,21 +1,21 @@
-# Flame: Overlays, Routing ve Oyun Içi Ekran Yonetimi
+# Flame: Overlays, Routing, and In-Game Screen Management
 
-Bu bolum, bir Flame oyununda **menu / HUD / pause / game over** gibi ekranlari iki tamamlayici mekanizmayla nasil yonetecegimizi anlatir:
+This section explains how to manage screens such as **menu / HUD / pause / game over** in a Flame game using two complementary mechanisms:
 
-1. **Overlays** — Oyun canvas'inin uzerine Flutter widget'lari bindirme (menuler, butonlar, dialoglar icin idealdir).
-2. **RouterComponent** — Oyunun *icinde*, Flame component'leri arasinda yigin (stack) tabanli gecis (menu -> playing -> paused -> game over).
+1. **Overlays** — Layering Flutter widgets on top of the game canvas (ideal for menus, buttons, and dialogs).
+2. **RouterComponent** — Stack-based transitions *inside* the game, between Flame components (menu -> playing -> paused -> game over).
 
-Cok sayida kucuk oyunu hizli uretmek icin kural: **Flutter UI = Overlays**, **oyun-ici sahne gecisleri = RouterComponent**. Ikisi `OverlayRoute` ile birlestirilebilir.
+The rule for rapidly producing many small games: **Flutter UI = Overlays**, **in-game scene transitions = RouterComponent**. The two can be combined via `OverlayRoute`.
 
 ---
 
-## 1. Overlays: Oyun Uzerine Flutter Widget'lari
+## 1. Overlays: Flutter Widgets on Top of the Game
 
-Flame oyunu bir Flutter widget agacinin icinde yasadigi icin, canvas'in uzerine herhangi bir Flutter widget'i yerlestirebilirsiniz. `Game.overlays` API'si bunu isimlendirilmis (named) overlay'leri ac/kapa yaparak kolaylastirir.
+Because the Flame game lives inside a Flutter widget tree, you can place any Flutter widget on top of the canvas. The `Game.overlays` API makes this easy by toggling named overlays on and off.
 
-### 1.1 GameWidget tarafinda: `overlayBuilderMap`
+### 1.1 On the GameWidget side: `overlayBuilderMap`
 
-Her overlay bir `String` anahtariyla tanimlanir ve `overlayBuilderMap` icinde bir builder fonksiyonuna eslenir. Builder imzasi: `(BuildContext context, MyGame game) => Widget`.
+Each overlay is defined by a `String` key and mapped to a builder function inside `overlayBuilderMap`. The builder signature is: `(BuildContext context, MyGame game) => Widget`.
 
 ```dart
 import 'package:flame/game.dart';
@@ -41,13 +41,13 @@ class GameView extends StatelessWidget {
 }
 ```
 
-`initialActiveOverlays`, oyun ilk yuklendiginde acik olacak overlay anahtarlarinin listesidir (ornekte HUD basta gorunur).
+`initialActiveOverlays` is the list of overlay keys that will be active when the game first loads (in the example, the HUD is visible initially).
 
-> Render sirasi `overlayBuilderMap` icindeki **anahtar sirasina** gore belirlenir; sonradan eklenen anahtar ustte cizilir.
+> Render order is determined by the **order of the keys** in `overlayBuilderMap`; a key added later is drawn on top.
 
-### 1.2 Oyun tarafinda: overlay'leri ac/kapa
+### 1.2 On the game side: toggle overlays on and off
 
-`game.overlays` uzerindeki metotlar:
+The methods on `game.overlays`:
 
 ```dart
 class MyGame extends FlameGame {
@@ -67,33 +67,33 @@ class MyGame extends FlameGame {
 }
 ```
 
-API ozeti:
+API summary:
 
 ```dart
-// 'SecondaryMenu' render edilsin (priority 1 -> ustte).
+// Render 'SecondaryMenu' (priority 1 -> on top).
 overlays.add('SecondaryMenu', priority: 1);
 
-// 'PauseMenu' render edilsin. priority = 0 (varsayilan) -> SecondaryMenu altinda.
+// Render 'PauseMenu'. priority = 0 (default) -> below SecondaryMenu.
 overlays.add('PauseMenu');
 
-// 'PauseMenu' render edilmesin.
+// Do not render 'PauseMenu'.
 overlays.remove('PauseMenu');
 
-// 'PauseMenu' acik/kapali durumunu tersine cevir.
+// Toggle the open/closed state of 'PauseMenu'.
 overlays.toggle('PauseMenu');
 
-// 'PauseMenu' su anda render ediliyor mu?
+// Is 'PauseMenu' currently being rendered?
 final hasPauseMenu = overlays.isActive('PauseMenu');
 
-// Kosula gore aktiflik ayarla.
+// Set activity conditionally.
 overlays.setActive('SecondaryMenu', active: !hasPauseMenu);
 ```
 
-`priority` parametresi overlay'lerin birbirine gore yigin sirasini belirler: yuksek `priority` ustte cizilir.
+The `priority` parameter determines the stacking order of overlays relative to one another: a higher `priority` is drawn on top.
 
-### 1.3 Ornek overlay widget'lari (pause / game over / HUD)
+### 1.3 Example overlay widgets (pause / game over / HUD)
 
-Overlay'ler dogrudan Flutter widget'i oldugu icin tum Flutter ekosistemi (butonlar, animasyon, tema) burada kullanilabilir.
+Because overlays are plain Flutter widgets, the entire Flutter ecosystem (buttons, animation, theming) can be used here.
 
 ```dart
 class PauseMenu extends StatelessWidget {
@@ -109,10 +109,10 @@ class PauseMenu extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Duraklatildi', style: TextStyle(fontSize: 32)),
+            const Text('Paused', style: TextStyle(fontSize: 32)),
             ElevatedButton(
               onPressed: game.resume,
-              child: const Text('Devam Et'),
+              child: const Text('Resume'),
             ),
           ],
         ),
@@ -134,29 +134,29 @@ class GameOverMenu extends StatelessWidget {
           game.overlays.remove('GameOver');
           game.restart();
         },
-        child: const Text('Tekrar Oyna'),
+        child: const Text('Play Again'),
       ),
     );
   }
 }
 ```
 
-> **Pause kalibi:** `overlays.add('PauseMenu')` ile birlikte `pauseEngine()` cagrilir; menu kapatilirken `overlays.remove(...)` + `resumeEngine()`. Bu, oyun guncellemesini durdururken Flutter UI'nin etkilesimli kalmasini saglar (detay icin Performans bolumune bakin).
+> **Pause pattern:** `pauseEngine()` is called together with `overlays.add('PauseMenu')`; when the menu is closed, `overlays.remove(...)` + `resumeEngine()`. This stops the game update while keeping the Flutter UI interactive (see the Performance section for details).
 
 ---
 
-## 2. RouterComponent: Oyun Içi Ekran/Sahne Yonetimi
+## 2. RouterComponent: In-Game Screen/Scene Management
 
-`RouterComponent`, Flutter'in `Navigator` sinifina benzeyen, **yigin tabanli** bir gezinme modeli sunar; fark, Flutter widget'lari yerine **Flame component'leri** ile calismasidir. Splash, ana menu, ayarlar, oyun ekrani, pop-up'lar gibi tum hedefleri organize eder.
+`RouterComponent` provides a **stack-based** navigation model similar to Flutter's `Navigator` class; the difference is that it works with **Flame components** instead of Flutter widgets. It organizes all destinations such as splash, main menu, settings, game screen, and pop-ups.
 
-Router icsel olarak bir route yigini tutar. Bir route gosterildiginde yiginin tepesine konur; `pop()` ile tepedeki sayfa kaldirilir. Route'lar benzersiz isimleriyle adreslenir.
+The router internally maintains a route stack. When a route is shown, it is placed on top of the stack; `pop()` removes the page on top. Routes are addressed by their unique names.
 
-### 2.1 Kurulum
+### 2.1 Setup
 
 ```dart
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-// Flutter'in Route sinifiyla cakismayi onlemek icin:
+// To avoid clashing with Flutter's Route class:
 import 'package:flutter/material.dart' hide Route;
 
 class MyGame extends FlameGame {
@@ -180,15 +180,15 @@ class MyGame extends FlameGame {
 }
 ```
 
-> **Önemli:** `material.dart` (veya baska bir paket) `Route` adinda bir sinif export ediyorsa, `import '...' hide Route;` kullanin.
+> **Important:** If `material.dart` (or another package) exports a class named `Route`, use `import '...' hide Route;`.
 
 ### 2.2 Route (opaque vs transparent, maintainState)
 
-`Route`'un ana ozelligi `builder`'idir: sayfanin icerigini olusturan component'i ureten fonksiyon. Route'lar `RouterComponent`'e cocuk olarak mount edilir.
+A `Route`'s primary property is its `builder`: the function that produces the component making up the page content. Routes are mounted as children of the `RouterComponent`.
 
-- **Opaque (varsayilan):** Altindaki route render edilmez ve pointer (tap/drag) olayi almaz. Tam ekran sayfalar icin kullanin.
-- **Transparent:** Altindaki route render edilir ve olay alir. Modal dialog, envanter, dialog UI icin kullanin. Görsel olarak transparan ama altina olay gecmemesini istiyorsaniz, route'a olaylari yakalayan bir arka plan component'i ekleyin.
-- **`maintainState`:** Varsayilan `true` — sayfa pop'landiktan sonra state korunur ve `builder` yalnizca ilk aktivasyonda calisir. `false` yaparsaniz pop sonrasi component atilir ve `builder` her aktivasyonda yeniden cagrilir.
+- **Opaque (default):** The route below it is not rendered and does not receive pointer (tap/drag) events. Use for full-screen pages.
+- **Transparent:** The route below it is rendered and receives events. Use for modal dialogs, inventory, and dialog UI. If you want it visually transparent but do not want events to pass through to what is below, add a background component to the route that captures events.
+- **`maintainState`:** Defaults to `true` — state is preserved after the page is popped, and `builder` runs only on the first activation. If you set it to `false`, the component is discarded after a pop and `builder` is called again on every activation.
 
 ```dart
 class HomePage extends Component with HasGameReference<MyGame> {
@@ -199,18 +199,18 @@ class HomePage extends Component with HasGameReference<MyGame> {
 }
 ```
 
-Mevcut route'u degistirmek icin `pushReplacementNamed` veya `pushReplacement` kullanilir (her ikisi de once mevcut route'ta `pop`, sonra push yapar).
+To replace the current route, use `pushReplacementNamed` or `pushReplacement` (both first `pop` the current route, then push).
 
 ```dart
-// Sahne gecisleri:
-game.router.pushNamed('settings');        // ustte yeni sayfa
-game.router.pop();                          // tepedeki sayfayi kaldir
-game.router.pushReplacementNamed('home');  // mevcut sayfayi degistir
+// Scene transitions:
+game.router.pushNamed('settings');        // new page on top
+game.router.pop();                          // remove the page on top
+game.router.pushReplacementNamed('home');  // replace the current page
 ```
 
-### 2.3 WorldRoute (level/dunya degistirme)
+### 2.3 WorldRoute (switching levels/worlds)
 
-`WorldRoute`, router uzerinden aktif oyun `World`'unu degistirmeyi saglar. Ayri `World` olarak yazilmis level'lar arasinda gecis icin idealdir. Varsayilan olarak mevcut dunyayi yenisiyle degistirir ve pop sonrasi state'ini korur (`maintainState: false` ile her aktivasyonda yeniden olusturulur). Yerlesik `CameraComponent` kullanmiyorsaniz kamerayi constructor'a acikca gecebilirsiniz.
+`WorldRoute` allows you to switch the active game `World` through the router. It is ideal for transitioning between levels written as separate `World`s. By default it replaces the current world with a new one and preserves its state after a pop (with `maintainState: false` it is recreated on every activation). If you are not using the built-in `CameraComponent`, you can pass the camera explicitly to the constructor.
 
 ```dart
 final router = RouterComponent(
@@ -230,12 +230,12 @@ class MyWorld1 extends World {
 }
 ```
 
-### 2.4 OverlayRoute (Flutter overlay'i route uzerinden)
+### 2.4 OverlayRoute (a Flutter overlay through a route)
 
-`OverlayRoute`, oyun overlay'lerini router uzerinden eklemeyi saglar; bu route'lar varsayilan olarak **transparent**'tir. Iki constructor vardir:
+`OverlayRoute` allows game overlays to be added through the router; these routes are **transparent** by default. There are two constructors:
 
-- Builder fonksiyonu alan (overlay widget'ini burada tanimlarsiniz),
-- `OverlayRoute.existing()` — overlay zaten `GameWidget`'in `overlayBuilderMap`'inde tanimliysa.
+- One that takes a builder function (where you define the overlay widget),
+- `OverlayRoute.existing()` — if the overlay is already defined in the `GameWidget`'s `overlayBuilderMap`.
 
 ```dart
 final router = RouterComponent(
@@ -250,21 +250,21 @@ final router = RouterComponent(
 );
 ```
 
-`GameWidget` icinde tanimli overlay'lerin route map'inde onceden tanimlanmasi bile gerekmez: `RouterComponent.pushOverlay()` bunu sizin yerinize yapar. Kayitli bir overlay route'u hem normal `.pushNamed()` hem de `.pushOverlay()` ile aktive edilebilir (ikisi ayni isi yapar; `.pushOverlay()` niyeti kodda daha acik kilar). Mevcut overlay `pushReplacementOverlay` ile degistirilebilir.
+Overlays defined inside the `GameWidget` do not even need to be pre-registered in the route map: `RouterComponent.pushOverlay()` does this for you. A registered overlay route can be activated with both the normal `.pushNamed()` and `.pushOverlay()` (both do the same thing; `.pushOverlay()` makes the intent clearer in the code). The current overlay can be replaced with `pushReplacementOverlay`.
 
 ```dart
 game.router.pushOverlay('confirm-dialog');
 ```
 
-Bu, **Overlays API'si ile RouterComponent'i birlestiren** kopru noktasidir: Flutter UI'yi (overlay) oyunun navigasyon yiginina entegre edersiniz.
+This is the bridge point that **combines the Overlays API with the RouterComponent**: you integrate the Flutter UI (overlay) into the game's navigation stack.
 
-### 2.5 ValueRoute (pop'ta deger donen route)
+### 2.5 ValueRoute (a route that returns a value on pop)
 
-`ValueRoute<T>`, yigindan cikarildiginda bir `T` degeri donen route'tur — kullanicidan onay alan dialoglar icin idealdir.
+`ValueRoute<T>` is a route that returns a `T` value when it is popped from the stack — ideal for dialogs that obtain confirmation from the user.
 
-Iki adim:
+Two steps:
 
-1. `ValueRoute<T>`'den turetin, `build()` metodunu override edin ve gosterilecek component'i olusturun. Component, route'u pop edip degeri dondurmek icin `completeWith(value)` cagirir.
+1. Derive from `ValueRoute<T>`, override the `build()` method, and create the component to be shown. The component calls `completeWith(value)` to pop the route and return the value.
 
 ```dart
 class YesNoDialog extends ValueRoute<bool> {
@@ -285,39 +285,39 @@ class YesNoDialog extends ValueRoute<bool> {
 }
 ```
 
-2. `Router.pushAndWait()` ile gosterin; route'tan donen degerle resolve olan bir future doner.
+2. Show it with `Router.pushAndWait()`; it returns a future that resolves with the value returned from the route.
 
 ```dart
 Future<void> confirmQuit() async {
-  final result = await game.router.pushAndWait(YesNoDialog('Emin misiniz?'));
+  final result = await game.router.pushAndWait(YesNoDialog('Are you sure?'));
   if (result) {
-    // ... kullanici emin
+    // ... user is sure
   } else {
-    // ... kullanici vazgecti
+    // ... user backed out
   }
 }
 ```
 
 ---
 
-## 3. Onerilen Oyun-Durum Akisi (Hizli Uretim Kalibi)
+## 3. Recommended Game-State Flow (Rapid Production Pattern)
 
-Cok sayida kucuk oyunda tekrarlanabilir bir kalip:
+A repeatable pattern across many small games:
 
-| Durum | Mekanizma |
+| State | Mechanism |
 |---|---|
-| Ana menu, ayarlar, level secimi | `RouterComponent` + `Route` |
-| Level/dunya gecisi | `WorldRoute` |
-| Oyun-ici HUD (skor, can) | Kalici overlay (`initialActiveOverlays`) veya Flame layout component'leri |
+| Main menu, settings, level selection | `RouterComponent` + `Route` |
+| Level/world transition | `WorldRoute` |
+| In-game HUD (score, health) | Persistent overlay (`initialActiveOverlays`) or Flame layout components |
 | Pause menu | `overlays.add('PauseMenu')` + `pauseEngine()` |
 | Game over | `overlays.add('GameOver')` |
-| Onay dialogu (cikis vb.) | `ValueRoute` + `pushAndWait` |
+| Confirmation dialog (quit, etc.) | `ValueRoute` + `pushAndWait` |
 
-Bu ayrim, UI'yi (Flutter, kolay stillenebilir) oyun mantigi sahnelerinden (Flame component'leri) net biçimde ayirir ve her yeni oyunda yeniden kullanilabilir.
+This separation cleanly distinguishes the UI (Flutter, easy to style) from the game-logic scenes (Flame components), and it is reusable in every new game.
 
 ---
 
-## Kaynaklar
+## Sources
 
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/overlays.md
 - https://raw.githubusercontent.com/flame-engine/flame/main/doc/flame/router.md

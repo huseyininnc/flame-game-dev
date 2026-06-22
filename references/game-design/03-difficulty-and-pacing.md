@@ -1,90 +1,90 @@
-# Zorluk Eğrisi, Pacing ve Denge (Balancing)
+# Difficulty Curve, Pacing, and Balancing
 
-Bu doküman zorluğun ve oyun boyu/oturum boyu ritmin nasıl tasarlanacağını verir. Level-içi pacing ve gating → `02-level-design-principles.md`; casual/puzzle'a özel sayısal tuning → `08-level-design-for-2d-casual.md`.
-
----
-
-## 1. Flow channel (akış kanalı)
-
-Csikszentmihalyi: bir eksende oyuncu **skill**, diğerinde **challenge**. "Flow channel", ikisinin yaklaşık eşit kaldığı çapraz banttır.
-- Challenge ≫ skill → **anksiyete/hüsran.**
-- Challenge ≪ skill → **can sıkıntısı.**
-- Oyuncu oynadıkça skill **yükselir**; bu yüzden **sabit zorluk hızla sıkıcı** olur. Zorluk oyuncuyla birlikte tırmanmalı.
-
-Pratik ölçüt: zorluğu **(oyun zorluğu − oyuncu becerisi)** olarak düşün; oturum boyunca bu farkı ~sabit/dar tut.
+This document covers how to design difficulty and the rhythm across a game/session. Within-level pacing and gating → `02-level-design-principles.md`; casual/puzzle-specific numerical tuning → `08-level-design-for-2d-casual.md`.
 
 ---
 
-## 2. İyi eğri: fractal / sawtooth (testere)
+## 1. Flow channel
 
-İyi zorluk eğrisi **düz çizgi değildir** — genel olarak yükselen, **küçük doruk ve çukurlardan** oluşan bir trend (fractal). Makro trend tırmanır, mikro doku nefes alır.
+Csikszentmihalyi: on one axis the player's **skill**, on the other the **challenge**. The "flow channel" is the diagonal band where the two stay roughly equal.
+- Challenge ≫ skill → **anxiety/frustration.**
+- Challenge ≪ skill → **boredom.**
+- As the player plays, skill **rises**; that's why **constant difficulty quickly becomes boring.** Difficulty must climb together with the player.
 
-- **Sawtooth:** birkaç level artan zorluk → bilerek **bir-iki level düşür** → tekrar tırman. Çukur; rahatlama, toparlanma ve ustalık hissi verir, sonraki tırmanışı taze kılar.
-- **Uygulama:** zorluğu bir formülden sür (linear / `sqrt` / `pow`) + sabit aralıklı periyodik bir sawtooth dip çıkar.
+Practical metric: think of difficulty as **(game difficulty − player skill)**; keep this gap ~constant/narrow throughout the session.
 
-### Difficulty spike — iyi vs kötü
-- **İyi spike:** bilinçli doruk (boss/gauntlet) **hemen ardından bir çukur** → oyuncu zaferi tadar, ustalık hisseder. Çukur, spike'ı yorucu değil tatmin edici yapar.
-- **Kötü spike:** plansız duvar. Klasik örnek **açılış kontrol-öğrenme spike'ı** ("zorluk eğrileri tepede başlar") — karmaşık kontroller, oyuncu yatırım yapmadan en zoru başa koyar. Çözüm: başta **daha az buton/basit kontrol**, mekanikleri tek tek öğret, oyuncunun zaten bildiği becerilere yaslan (tap, swipe).
+---
+
+## 2. The good curve: fractal / sawtooth
+
+A good difficulty curve **is not a straight line** — it's an overall-rising trend made of **small peaks and valleys** (fractal). The macro trend climbs, the micro texture breathes.
+
+- **Sawtooth:** a few levels of increasing difficulty → deliberately **drop one or two levels** → climb again. The valley gives relief, recovery, and a sense of mastery, and makes the next climb feel fresh.
+- **Application:** drive difficulty from a formula (linear / `sqrt` / `pow`) + subtract a periodic sawtooth dip at fixed intervals.
+
+### Difficulty spike — good vs bad
+- **Good spike:** a deliberate peak (boss/gauntlet) **immediately followed by a valley** → the player tastes victory and feels mastery. The valley makes the spike satisfying rather than exhausting.
+- **Bad spike:** an unplanned wall. The classic example is the **opening control-learning spike** ("difficulty curves start at their peak") — complex controls, the hardest thing placed first before the player has invested. Solution: **fewer buttons/simpler controls** at the start, teach mechanics one at a time, lean on skills the player already knows (tap, swipe).
 
 ---
 
 ## 3. Interest curve (Jesse Schell)
 
-Oyuncunun ilgisini zamana karşı çiz:
-1. **Hook** — erken keskin sıçrama (dikkat yakala; hızlı bir kazanç).
-2. **Rising action** — her biri öncekinden yüksek doruklar, aralarda küçük çukurlar.
-3. **Climax** — sona yakın en yüksek nokta.
-4. **Resolution** — kısa iniş, "daha fazlasını isteten" son.
+Plot the player's interest against time:
+1. **Hook** — an early sharp jump (grab attention; a quick win).
+2. **Rising action** — peaks each higher than the last, with small valleys between.
+3. **Climax** — the highest point near the end.
+4. **Resolution** — a short descent, an ending that "leaves them wanting more."
 
-**Fractal'dır:** tüm oyunun, her level'ın, her oturumun kendi interest curve'ü olmalı. **Teşhis aracı olarak kullan:** beklenen eğriyi çiz, düz/sarkan bölgeleri bul — pacing problem noktaların onlardır.
+**It's fractal:** the whole game, each level, and each session should have its own interest curve. **Use it as a diagnostic tool:** draw the expected curve, find the flat/sagging regions — those are your pacing problem points.
 
-**Oturuma uygula (mobil için kritik):** ilk saniyelerde hook → birkaç yükselen beat → tatmin edici doruk (boss/combo/büyük ödül) → bir sonrakine çekecek küçük yüksek nokta.
+**Apply to the session (critical for mobile):** a hook in the first seconds → a few rising beats → a satisfying peak (boss/combo/big reward) → a small high point to pull into the next one.
 
 ---
 
-## 4. Intensity ramps / "nefes alma"
+## 4. Intensity ramps / "breathing"
 
-- **Ana yasa:** algı **görecelidir** — 5→11 büyük sıçrama, 10→11 hiçtir. Sürekli yüksek yoğunluk taban çizgisini sıfırlar.
-- **In-out-in (Schell):** patlamayla aç → **geri çekil** (oyuncu adapte olsun) → giderek büyüyen beat'lerle yüksel → beklentiyi aşan doruk. Sonra bir üst ölçekte tekrar.
-- **Rest ≠ hareketsizlik:** göreceli düşüş. Bir doruğu hissettirmek için öncesinde yoğunluğu **düşür** — önce negatif boşluğu (lull) tasarla, doruğu ona karşı yerleştir.
+- **Core law:** perception is **relative** — 5→11 is a huge jump, 10→11 is nothing. Constant high intensity resets the baseline.
+- **In-out-in (Schell):** open with a burst → **pull back** (let the player adapt) → rise with ever-growing beats → a peak that exceeds expectation. Then repeat at a higher scale.
+- **Rest ≠ inactivity:** it's a relative drop. To make a peak felt, **lower** intensity beforehand — design the negative space (the lull) first, then place the peak against it.
 
 ---
 
 ## 5. Dynamic Difficulty Adjustment (DDA) & rubber-banding
 
-DDA: oyuncu performansına göre oyunu otomatik ayarlayıp onu flow channel'da tutar. **Rubber-banding** en bilinen basit biçimdir (yarış oyunları: geride kalan AI hızlanır).
+DDA: automatically tunes the game to player performance to keep them in the flow channel. **Rubber-banding** is its best-known simple form (racing games: the trailing AI speeds up).
 
-Teknikler: düşman can/hasar/spawn oranını ölçekle, aim-assist ayarla, kaynak/ammo drop'unu ihtiyaca göre tune et, level seçimini başarı oranına göre nudge et.
+Techniques: scale enemy health/damage/spawn rate, adjust aim-assist, tune resource/ammo drops to need, nudge level selection based on success rate.
 
-- **Artılar:** daha geniş oyuncu yelpazesini flow'da tutar; çeşitlilik/replay.
-- **Riskler:** fark edilirse **haksız** hissettirir; oyuncular sistemi **suistimal** edebilir (kasten geri kalıp boost almak); **monetizasyon güdümlü gizli zorluk ayarı etik dışıdır — yapma.**
-- **İyi uygula:** **görünmez** olsun; sınırlı/sübtil ayar; erişilebilirlik (zorlanan oyuncuya yardım) için iyi; rekabetçi PvP'de ve adalet algısının çekirdek olduğu yerde dikkatli ol; mümkünse oyuncuya opt-in/seçim bırak.
-
----
-
-## 6. Balancing (denge)
-
-- **Fairness:** tüm anlamlı seçenekler kıyaslanabilir derecede uygulanabilir olmalı; oyuncu kaybın **kendi hatası** olduğunu hissetmeli (görünür "hile" yapan AI bunu bozar).
-- **Readability & telegraphing:** tehlikeli her şeyi telegraph et (wind-up animasyonu, ses tell'i, vuruş bölgesi) → reaksiyon şans değil **skill** olsun. Can/cooldown/tehdit görsel olarak net.
-- **Risk/reward:** güç bir bedel taşımalı (uzun cooldown, kaynak maliyeti, toparlanma penceresi, pozisyonel açık). Bedelini yazamıyorsan **overpowered**'dır.
-- **Dominant strategy avı:** bir strateji diğerlerini sürekli yeniyorsa ifade çöker → nerf et ya da counter'ını buff et. Playtest'te aktif olarak ara.
-- **Symmetric vs asymmetric:** simetrik (herkese aynı araç; dengelemesi kolay; rekabetçi puzzle) vs asimetrik ("farklı ama eşit uygulanabilir"; dengelemesi zor, çeşitlilik yüksek). **Intransitivity (taş-kâğıt-makas)** iş gören araçtır: dairesel counter-play kur, hiçbir seçenek domine etmesin.
+- **Pros:** keeps a wider range of players in flow; variety/replayability.
+- **Risks:** feels **unfair** if noticed; players can **exploit** the system (deliberately falling behind to get a boost); **monetization-driven hidden difficulty adjustment is unethical — don't do it.**
+- **Do it well:** keep it **invisible**; limited/subtle adjustment; good for accessibility (helping a struggling player); be careful in competitive PvP and anywhere the perception of fairness is core; where possible, leave the player an opt-in/choice.
 
 ---
 
-## Tek-sayfa özet
+## 6. Balancing
 
-1. Zorluğu oyuncuyla birlikte tırmandır (flow channel); **(zorluk − beceri)** farkını dar tut.
-2. Eğri **sawtooth**: tırman → bilerek düşür → tırman. Spike'tan sonra **mutlaka çukur**.
-3. Açılış **kontrol spike**'ından kaç: az buton, tek tek öğret, bilinen becerilere yaslan.
-4. **Interest curve fractal'dır** (oyun/level/oturum); çiz, düz bölgeleri düzelt; oturumu hook→yüksel→doruk→çekiş ile kur.
-5. **Görecelik:** doruğu hissettirmek için önce yoğunluğu düşür (in-out-in).
-6. DDA kullanırsan **görünmez & etik** olsun.
-7. Her tehlikeyi telegraph et; her güce bir **bedel** yaz; dominant strategy'yi avla; mümkünse intransitive counter-loop.
+- **Fairness:** all meaningful options should be comparably viable; the player should feel a loss is **their own fault** (an AI that visibly "cheats" breaks this).
+- **Readability & telegraphing:** telegraph everything dangerous (wind-up animation, audio tell, hit zone) → reaction becomes **skill**, not luck. Health/cooldown/threat are visually clear.
+- **Risk/reward:** power must carry a cost (long cooldown, resource cost, recovery window, positional opening). If you can't write down its cost, it's **overpowered**.
+- **Dominant-strategy hunting:** if one strategy consistently beats the others, expression collapses → nerf it or buff its counter. Actively hunt for this in playtests.
+- **Symmetric vs asymmetric:** symmetric (same tools for everyone; easy to balance; competitive puzzle) vs asymmetric ("different but equally viable"; hard to balance, high variety). **Intransitivity (rock-paper-scissors)** is a workhorse tool: build circular counter-play so no option dominates.
 
 ---
 
-## Kaynaklar
+## One-page summary
+
+1. Climb difficulty together with the player (flow channel); keep the **(difficulty − skill)** gap narrow.
+2. The curve is a **sawtooth**: climb → deliberately drop → climb. After a spike, **always a valley**.
+3. Avoid the opening **control spike**: few buttons, teach one at a time, lean on known skills.
+4. **The interest curve is fractal** (game/level/session); draw it, fix the flat regions; build the session with hook→rise→peak→pull.
+5. **Relativity:** to make a peak felt, lower intensity first (in-out-in).
+6. If you use DDA, keep it **invisible & ethical**.
+7. Telegraph every danger; write a **cost** for every power; hunt the dominant strategy; where possible an intransitive counter-loop.
+
+---
+
+## Sources
 
 - Flow theory (Csikszentmihalyi) — Yu-kai Chou: https://yukaichou.com/gamification-analysis/flow-theory-complete-guide-csikszentmihalyi-optimal-experience/
 - Difficulty Curves Start At Their Peak — Game Developer: https://www.gamedeveloper.com/design/difficulty-curves-start-at-their-peak

@@ -1,21 +1,21 @@
-# AI Asset Üretimi (Vertex GenAI)
+# AI Asset Generation (Vertex GenAI)
 
-> Üretici araçlar ve `.env.example` bu skill içinde **gömülüdür** (`scripts/`, skill köküne göreli). Açık kaynak için araçlar **generic & config (manifest) güdümlüdür** — her oyuna ayrı betik yazılmaz; bir JSON manifest yazıp tek aracı çalıştırırsın. Kurulum: `cd scripts && pip install -r requirements.txt && cp .env.example .env` (`.env`'e `VERTEX_API_KEY` koy; `.env` commit edilmez). Tam kullanım: `scripts/README.md`.
+> The generator tools and `.env.example` are **embedded** within this skill (`scripts/`, relative to the skill root). For open source, the tools are **generic & config (manifest) driven** — you don't write a separate script per game; you write a JSON manifest and run a single tool. Setup: `cd scripts && pip install -r requirements.txt && cp .env.example .env` (put `VERTEX_API_KEY` in `.env`; `.env` is not committed). Full usage: `scripts/README.md`.
 
-İki generic araç:
-- **`scripts/asset_gen.py`** — Vertex GenAI (Gemini image, `gemini-3-pro-image-preview`) ile görseller; prompt-driven; opaque veya chroma-key şeffaf; webp kaydeder.
-- **`scripts/audio_gen.py`** — sadece Python stdlib ile sentez sfx/bgm (`.wav`); bağımlılık yok.
+Two generic tools:
+- **`scripts/asset_gen.py`** — images via Vertex GenAI (Gemini image, `gemini-3-pro-image-preview`); prompt-driven; opaque or chroma-key transparent; saves webp.
+- **`scripts/audio_gen.py`** — synthesized sfx/bgm (`.wav`) using only the Python stdlib; no dependencies.
 
-## Görsel üretimi (manifest)
+## Image generation (manifest)
 
 ```bash
-python asset_gen.py --manifest mygame_assets.json --out <oyun>/assets/images
+python asset_gen.py --manifest mygame_assets.json --out <game>/assets/images
 ```
 
 Manifest:
 ```json
 {
-  "style": "her prompt'a eklenen global style-guide (opsiyonel)",
+  "style": "global style-guide appended to every prompt (optional)",
   "assets": [
     {"name":"bg",    "aspect":"9:16","mode":"opaque",  "prompt":"..."},
     {"name":"hero",  "aspect":"1:1", "mode":"magenta", "prompt":"..."},
@@ -23,39 +23,39 @@ Manifest:
   ]
 }
 ```
-- `mode: opaque` → opak webp (arka plan, ikon, full-frame sahne).
-- `mode: green | magenta` → o chroma ekranda üretilir, sonra cutout ile **şeffaf** webp. (Bu model "transparent background" prompt'undan gerçek alfa vermez; şeffaflık chroma + cutout iledir.)
-- **Chroma rengini özneyle çakışmayacak şekilde seç:** yeşil/cyan/mavi özne → `magenta`; kırmızı/magenta özne → `green`. (Yeşil özneyi yeşil ekranda üretirsen keylenip silinir.)
-- `name` alt-klasör içerebilir (`ui/button`). Bayraklar: `--model --delay --overwrite --api-key`.
+- `mode: opaque` → opaque webp (background, icon, full-frame scene).
+- `mode: green | magenta` → generated on that chroma screen, then a **transparent** webp via cutout. (This model does not produce real alpha from a "transparent background" prompt; transparency comes from chroma + cutout.)
+- **Choose the chroma color so it does not clash with the subject:** green/cyan/blue subject → `magenta`; red/magenta subject → `green`. (If you generate a green subject on a green screen, it gets keyed out and deleted.)
+- `name` may contain a sub-folder (`ui/button`). Flags: `--model --delay --overwrite --api-key`.
 
-## Sanat yönü serbesttir (oyuna göre OTOMATİK)
+## Art direction is free (AUTOMATIC per game)
 
-Stil oyunun içeriğine/temasına göre seçilir — modern flat/vektör, painterly, cartoon, izometrik, pixel-art vb. **Pixel-art zorunlu/varsayılan değil.** Her oyunda **tutarlı tek style-guide** belirle (manifest `style` alanı) ve tüm asset'lere uygula. Per-game görsel kimlik kuralları: `references/game-design/09-art-ui-identity-and-orientation.md`.
+The style is chosen according to the game's content/theme — modern flat/vector, painterly, cartoon, isometric, pixel-art, etc. **Pixel-art is not mandatory/default.** For each game, define a **single consistent style-guide** (the manifest `style` field) and apply it to all assets. Per-game visual identity rules: `references/game-design/09-art-ui-identity-and-orientation.md`.
 
-## Görsel prompt kalıbı
+## Image prompt pattern
 ```
-<konu>, <stil-rehberi: modern flat / painterly / vektör / pixel art ...>,
-<palet/renk>, centered, single subject,
+<subject>, <style-guide: modern flat / painterly / vector / pixel art ...>,
+<palette/color>, centered, single subject,
 no text, no watermark, fully original, no existing characters or brands.
 ```
-(Chroma ekran cümlesini `asset_gen.py` `mode`'a göre otomatik ekler — manifest'te tekrar yazma.)
+(`asset_gen.py` automatically appends the chroma-screen sentence based on `mode` — don't write it again in the manifest.)
 
-## Ses üretimi (manifest)
+## Audio generation (manifest)
 
 ```bash
-python audio_gen.py --manifest mygame_audio.json --out <oyun>/assets/audio
+python audio_gen.py --manifest mygame_audio.json --out <game>/assets/audio
 ```
-`sfx` = tone `ops` dizisi (`freq` veya akor `freqs`, `dur`, ops: `vol/shape(sine|square|tri)/glide/attack/release`); `music` = ambient pad (`voices`, `seconds`). sfx kısa (`assets/audio/sfx/`), bgm döngü (`assets/audio/music/`). Motor tarafı: `FlameAudio.play` / `FlameAudio.bgm` (bkz. `references/flame/08`).
+`sfx` = a `tone` `ops` array (`freq` or chord `freqs`, `dur`, ops: `vol/shape(sine|square|tri)/glide/attack/release`); `music` = an ambient pad (`voices`, `seconds`). sfx short (`assets/audio/sfx/`), bgm loop (`assets/audio/music/`). Engine side: `FlameAudio.play` / `FlameAudio.bgm` (see `references/flame/08`).
 
-## Güvenlik / kimlik bilgisi
+## Security / credentials
 
-- API anahtarı `scripts/.env` (`.gitignore` ile korunur) veya `--api-key` / env — **asla commit edilmez**, asla prompt/manifest içine gömülmez.
-- Prompt'lara daima `fully original, no existing IP, no brand logos, no copyrighted characters, no text` ekle (telif güvenliği; bkz. game-greenlight `copyright-clearance`).
-- Ham PNG çıktıları repo'yu şişirmesin; yalnızca son webp/wav `assets/` altına.
+- The API key goes in `scripts/.env` (protected by `.gitignore`) or via `--api-key` / env — **never committed**, never embedded inside a prompt/manifest.
+- Always add `fully original, no existing IP, no brand logos, no copyrighted characters, no text` to prompts (copyright safety; see game-greenlight `copyright-clearance`).
+- Do not let raw PNG outputs bloat the repo; only the final webp/wav go under `assets/`.
 
-## Akış
+## Flow
 
-1. Oyunun style-guide'ını + sanat yönünü + per-game kimliğini belirle (KB/09).
-2. Görsel + ses **manifest**'lerini yaz (oyuna özel; chroma mode'larını özneye göre seç).
-3. `asset_gen.py` / `audio_gen.py` çalıştır → gözden geçir → `assets/images/` (webp) ve `assets/audio/` altına yerleşir.
-4. `pubspec.yaml`'a `assets/` ekle; `onLoad`'da `Sprite.load` ile preload.
+1. Define the game's style-guide + art direction + per-game identity (KB/09).
+2. Write the image + audio **manifests** (game-specific; choose chroma modes based on the subject).
+3. Run `asset_gen.py` / `audio_gen.py` → review → they land under `assets/images/` (webp) and `assets/audio/`.
+4. Add `assets/` to `pubspec.yaml`; preload with `Sprite.load` in `onLoad`.
